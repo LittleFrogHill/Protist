@@ -61,7 +61,29 @@ Kenny Data
 	nohup sh rsem_shell/$i.sh > rsem_shell/$i.log &
 	done
 
+## 4.merge
+	find * -name '*.genes.results'> merge_result/merged.genes.quant.file
+	find * -name '*.isoforms.results'> merge_result/merged.isoform.quant.file
+	/home/shangao/Software/Assembly/trinityrnaseq-v2.11.0/util/misc/merge_RSEM_output_to_matrix.pl --rsem_files merge_result/merged.genes.quant.file --mode counts > merge_result/merged.genes.result.file
 
+## 5.DEseq
+	R
+	library('DESeq2')
+	colData <- read.table('sample.list', header=T,row.names=1)
+	countData <-read.table('./merged.genes.result.file', row.names='id',header=T)
+	dds <- DESeqDataSetFromMatrix(countData = round(countData),colData = colData, design = ~ group)
+	dds <- dds[ rowSums(counts(dds)) > 50, ]
+	dds2 <- DESeq(dds)
+	res <- results(dds2)
+	resdata <- merge(as.data.frame(res), as.data.frame(counts(dds2, normalized=TRUE)),by='row.names',sort=FALSE)
+	write.table(file='DEseq.result.gene',resdata,col.names=T,row.names=F,sep=',',quote=F)
+	
+## 6.get q<0.05 DEGs
+	head -n 1 DEseq.result.gene |sed 's/,/\t/g' > gene.title
+	sed 's/,/\t/g' DEseq.result.gene |awk '$7<= 0.05 {print$0}' > gene
+	cat gene.title gene > DEseq.adj.gene
+	
+## 7.
 
 
 ## 1.Annotation with docker KOBAS
