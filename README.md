@@ -83,7 +83,51 @@ Kenny Data
 	sed 's/,/\t/g' DEseq.result.gene |awk '$7<= 0.05 {print$0}' > gene
 	cat gene.title gene > DEseq.adj.gene
 	
-## 7.
+## 7.Plot
+###MA_plot
+	
+	pdf("Ma.pdf")
+	plotMA(res, ylim=c(-10,10),alpha =0.005)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/119115054-0678c100-ba27-11eb-8d30-e3122df66399.png)
+
+###rlog_plot
+	
+	pdf("rlog.pdf")
+	plot( assay(rld)[, 5:6], col="#00000020", pch=20, cex=0.3 )
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/119119524-8ef96080-ba2b-11eb-8820-f8873f8b17d1.png)
+
+###sample_distances_plot
+	
+	sampleDistMatrix <- as.matrix( sampleDists )
+	rownames(sampleDistMatrix) <- paste( rld$treatment, 
+	   rld$patient, sep="-" )
+	colnames(sampleDistMatrix) <- NULL   
+	library( "gplots" )
+	library( "RColorBrewer" )
+	colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+	
+	pdf("heatmap_sample_distances.pdf")
+	heatmap.2( sampleDistMatrix, trace="none", col=colours)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/119121020-36c35e00-ba2d-11eb-834b-987537efe117.png)
+
+###PCA_plot
+	pdf("pca_sample_distances.pdf")
+	plotPCA( rld, intgroup = ("group") )
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/119120547-b270db00-ba2c-11eb-8b9b-e270e6595fca.png)
+
+###SD_top500_plot
+	
+	pdf("heatmap_top500SDgenes.pdf")
+	topVarGenes <- head( order( rowVars( assay(rld) ), decreasing=TRUE ), 500 )
+	heatmap.2( assay(rld)[ topVarGenes, ], scale="row", trace="none", dendrogram="column", col = colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255), ColSideColors = c( Control="gray", DPN="darkgreen", OHT="orange" )[colData(rld)$group ] )
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/119122778-2dd38c00-ba2f-11eb-801e-5a533dbf7983.png)
+
+
 
 
 ## 1.Annotation with docker KOBAS
