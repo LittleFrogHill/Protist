@@ -138,6 +138,6 @@ Kenny Data
 	
 	identify.py -f anno_seq.tsv -o identify.out -q /opt/kobas-3.0/sqlite3 -y /opt/kobas-3.0/seq_pep
 
-###If you don’t know the code for your species it can be found here: 
+### If you don’t know the code for your species it can be found here: 
 https://www.kegg.jp/kegg/catalog/org_list.html
-###If your species of interest is not available then you should choose the code for the closest-related species available
+### If your species of interest is not available then you should choose the code for the closest-related species available
