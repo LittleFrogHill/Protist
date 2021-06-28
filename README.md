@@ -144,4 +144,28 @@ https://www.kegg.jp/kegg/catalog/org_list.html
 https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 ![image](https://user-images.githubusercontent.com/34407101/122572035-a5f09a00-d04d-11eb-8f0e-d8a04e6a7032.png)https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 
+## 8.clusterpr
+http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
 
+	R
+	d <- read.table('hsaIDFC.out')
+	geneList <- d[,2]
+	names(geneList) <- as.character(d[,1])
+	geneList <- sort(geneList, decreasing = TRUE)
+	gene <- names(geneList)[abs(geneList) > 0.5]
+	library(clusterProfiler)
+	library(org.Hs.eg.db)
+	kk <- enrichKEGG(gene         = gene,organism     = 'hsa',pvalueCutoff = 0.05)
+	head(kk)
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
