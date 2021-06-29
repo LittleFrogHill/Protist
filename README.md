@@ -146,7 +146,7 @@ https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 
 ## 8.clusterpr
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
-
+Human_database
 	R
 	d <- read.table('hsaIDFC.out')
 	geneList <- d[,2]
@@ -158,8 +158,56 @@ http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
 	kk <- enrichKEGG(gene         = gene,organism     = 'hsa',pvalueCutoff = 0.05)
 	head(kk)
 	
+### barplot
+![image](https://user-images.githubusercontent.com/34407101/123746111-7c3b3c80-d8b1-11eb-8b65-5d1c10a29a63.png)
+### dotplot
+![image](https://user-images.githubusercontent.com/34407101/123746159-8cebb280-d8b1-11eb-9e27-9d8bd082c41a.png)
+### Network
+	> pdf('Network1.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(edox, foldChange=geneList,showCategory=20)
+	> dev.off()
+	
+	> pdf('Network2.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,)
+	x=             showCategory=  foldChange=    layout=        ...=           
+	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,showCategory=20)
+	> dev.off()
+	
+	> pdf('Network3.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(kk, foldChange=geneList, circular = TRUE, colorEdge = TRUE,showCategory=20)
+	Warning message:
+	ggrepel: 1 unlabeled data points (too many overlaps). Consider increasing max.overlaps 
+	> dev.off()
+	
+	> pdf('Network_Enriched1.pdf',pointsize=1,width=50,height=50)
+	> cnetplot(edox, node_label="all",showCategory=20)
+	> dev.off()
+
+### Heatmap
+	> pdf('Heatmap.pdf',pointsize=1,width=80,height=10)
+	> heatplot(edox, foldChange=geneList)
+	> dev.off()
+	
+### Enrich
+	> pdf('Enrich.pdf',pointsize=5,width=50,height=50)
+	> emapplot(kk, pie_scale=1.5,layout="kk")
+	> dev.off()
 	
 	
+
+	
+Ptm_database
+	
+	pdf('bar1.pdf')
+	barplot(kk1, showCategory=20)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746304-bf95ab00-d8b1-11eb-97d8-0d40c73ab091.png)
+	
+	pdf('dot.pdf')
+	dotplot(kk, showCategory=30) + ggtitle("dotplot for ptm_database")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
+
 	
 	
 	
