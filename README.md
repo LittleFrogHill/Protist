@@ -146,7 +146,9 @@ https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 
 ## 8.clusterpr
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
+
 Human_database
+
 	R
 	d <- read.table('hsaIDFC.out')
 	geneList <- d[,2]
@@ -192,11 +194,18 @@ Human_database
 	> pdf('Enrich.pdf',pointsize=5,width=50,height=50)
 	> emapplot(kk, pie_scale=1.5,layout="kk")
 	> dev.off()
-	
-	
 
 	
 Ptm_database
+	
+	d <- read.table('ptm.annoDEGs.out')
+	geneList <- d[,2]
+	names(geneList) <- as.character(d[,1])
+	geneList <- sort(geneList, decreasing = TRUE)
+	gene <- names(geneList)[abs(geneList) > 0.5]
+	library(clusterProfiler)
+	
+	
 	
 	pdf('bar1.pdf')
 	barplot(kk1, showCategory=20)
