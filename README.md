@@ -151,7 +151,7 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 Human_database
 
 	R
-	d <- read.table('hsaIDFC.out')
+	d <- read.table('hsa_anno.out')
 	geneList <- d[,2]
 	names(geneList) <- as.character(d[,1])
 	geneList <- sort(geneList, decreasing = TRUE)
