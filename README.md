@@ -147,6 +147,8 @@ https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 ## 8.clusterpr
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
 https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
+https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html
+https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 
 Human_database
 
