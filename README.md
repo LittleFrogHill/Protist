@@ -105,29 +105,31 @@ Kenny Data
 	vsd <- vst(dds, blind=FALSE)
 	
 ## 7.Plot
-###MA_plot
-####In DESeq2, the function plotMA shows the log2 fold changes attributable to a given variable over the mean of normalized counts for all the samples in the DESeqDataSet. Points will be colored red if the adjusted p value is less than 0.1. Points which fall out of the window are plotted as open triangles pointing either up or down.
+
+### MA_plot
+
+#### In DESeq2, the function plotMA shows the log2 fold changes attributable to a given variable over the mean of normalized counts for all the samples in the DESeqDataSet. Points will be colored red if the adjusted p value is less than 0.1. Points which fall out of the window are plotted as open triangles pointing either up or down.
 
 	pdf("Ma.pdf")
 	plotMA(res, ylim=c(-10,10),alpha =0.005)
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/144275542-4497977e-23de-4ada-96aa-c172c727a0c1.png)
 
-###Plot counts
-####It can also be useful to examine the counts of reads for a single gene across the groups. A simple function for making this plot is plotCounts, which normalizes counts by the estimated size factors (or normalization factors if these were used) and adds a pseudocount of 1/2 to allow for log scale plotting. The counts are grouped by the variables in intgroup, where more than one variable can be specified. Here we specify the gene which had the smallest p value from the results table created above. You can select the gene to plot by rowname or by numeric index.
+### Plot counts
+#### It can also be useful to examine the counts of reads for a single gene across the groups. A simple function for making this plot is plotCounts, which normalizes counts by the estimated size factors (or normalization factors if these were used) and adds a pseudocount of 1/2 to allow for log scale plotting. The counts are grouped by the variables in intgroup, where more than one variable can be specified. Here we specify the gene which had the smallest p value from the results table created above. You can select the gene to plot by rowname or by numeric index.
 
 	pdf("count.pdf")
 	plot( assay(rld)[, 5:6], col="#00000020", pch=20, cex=0.3 )
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/144279240-df58206b-88f5-47da-8aa4-6a57d1c8da3c.png)
 
-###rlog_plot
+### rlog_plot
 	
 	pdf("rlog.pdf")
 	plot( assay(rld)[, 5:6], col="#00000020", pch=20, cex=0.3 )
 ![image](https://user-images.githubusercontent.com/34407101/144280051-ff83d978-5909-4b0a-b1a2-26a46299a61b.png)
 
-###sample_distances_plot
+### sample_distances_plot
 	
 	sampleDistMatrix <- as.matrix( sampleDists )
 	rownames(sampleDistMatrix) <- colnames(rld)
@@ -141,21 +143,34 @@ Kenny Data
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/144289021-d7d3694a-fe62-44e5-9fc9-08c83e1e6077.png)
 
-###PCA_plot
+### PCA_plot
 	pdf("pca_sample_distances.pdf")
 	plotPCA( rld, intgroup = ("group") )
 	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/119120547-b270db00-ba2c-11eb-8b9b-e270e6595fca.png)
+![image](https://user-images.githubusercontent.com/34407101/144292107-ae651dd5-4082-48e4-827f-062389da59ec.png)
 
-###SD_top500_plot
+### SD_top500_plot
 	
 	pdf("heatmap_top500SDgenes.pdf")
 	topVarGenes <- head( order( rowVars( assay(rld) ), decreasing=TRUE ), 500 )
 	heatmap.2( assay(rld)[ topVarGenes, ], scale="row", trace="none", dendrogram="column", col = colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255), ColSideColors = c( Control="gray", DPN="darkgreen", OHT="orange" )[colData(rld)$group ] )
 	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/119122778-2dd38c00-ba2f-11eb-801e-5a533dbf7983.png)
+![image](https://user-images.githubusercontent.com/34407101/144292473-5675ec31-3e2f-440d-8110-b1384caf3264.png)
+
+#### SD_top35_plot
+![image](https://user-images.githubusercontent.com/34407101/144296237-7cbff44a-9a8b-4f0e-b3d9-9aed9dd0321f.png)
+#### SD_top50_plot
+![image](https://user-images.githubusercontent.com/34407101/144296431-341370eb-2278-4302-8f3c-638a6eee3674.png)
+#### SD_top100_plot
+![image](https://user-images.githubusercontent.com/34407101/144296381-fcd0ff76-3e81-48f2-bcd1-68dc455855dd.png)
 
 https://jokergoo.github.io/ComplexHeatmap-reference/book/other-tricks.html
+
+### Volcano
+	pdf("volcano.pdf")	
+	EnhancedVolcano(res,lab = rownames(res),x = 'log2FoldChange',y = 'pvalue',title = 'sex vs asexual', FCcutoff = 0.5, pointSize = 1.0,labSize = 1.0)
+	dev.off()	
+![image](https://user-images.githubusercontent.com/34407101/144298869-4b265913-7ddd-426b-9148-46fe01bfaf8c.png)
 
 
 ## 1.Annotation with docker KOBAS
