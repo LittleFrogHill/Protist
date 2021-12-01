@@ -101,27 +101,37 @@ Kenny Data
 	sed 's/,/\t/g' DEseq.result.gene |awk '$7<= 0.05 {print$0}' > gene
 	cat gene.title gene > DEseq.adj.gene
 	
+	rld <- rlog(dds, blind=FALSE)
+	vsd <- vst(dds, blind=FALSE)
+	
 ## 7.Plot
 ###MA_plot
-	
+####In DESeq2, the function plotMA shows the log2 fold changes attributable to a given variable over the mean of normalized counts for all the samples in the DESeqDataSet. Points will be colored red if the adjusted p value is less than 0.1. Points which fall out of the window are plotted as open triangles pointing either up or down.
+
 	pdf("Ma.pdf")
 	plotMA(res, ylim=c(-10,10),alpha =0.005)
 	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/119115054-0678c100-ba27-11eb-8d30-e3122df66399.png)
+![image](https://user-images.githubusercontent.com/34407101/144275542-4497977e-23de-4ada-96aa-c172c727a0c1.png)
+
+###Plot counts
+####It can also be useful to examine the counts of reads for a single gene across the groups. A simple function for making this plot is plotCounts, which normalizes counts by the estimated size factors (or normalization factors if these were used) and adds a pseudocount of 1/2 to allow for log scale plotting. The counts are grouped by the variables in intgroup, where more than one variable can be specified. Here we specify the gene which had the smallest p value from the results table created above. You can select the gene to plot by rowname or by numeric index.
+
+	pdf("count.pdf")
+	plot( assay(rld)[, 5:6], col="#00000020", pch=20, cex=0.3 )
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/144279240-df58206b-88f5-47da-8aa4-6a57d1c8da3c.png)
 
 ###rlog_plot
 	
 	pdf("rlog.pdf")
 	plot( assay(rld)[, 5:6], col="#00000020", pch=20, cex=0.3 )
-	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/119119524-8ef96080-ba2b-11eb-8820-f8873f8b17d1.png)
+![image](https://user-images.githubusercontent.com/34407101/144280051-ff83d978-5909-4b0a-b1a2-26a46299a61b.png)
 
 ###sample_distances_plot
 	
 	sampleDistMatrix <- as.matrix( sampleDists )
-	rownames(sampleDistMatrix) <- paste( rld$treatment, 
-	   rld$patient, sep="-" )
-	colnames(sampleDistMatrix) <- NULL   
+	rownames(sampleDistMatrix) <- colnames(rld)
+	colnames(sampleDistMatrix) <- c(rep('asex', times=5), rep('sex', times=5))
 	library( "gplots" )
 	library( "RColorBrewer" )
 	colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
@@ -129,7 +139,7 @@ Kenny Data
 	pdf("heatmap_sample_distances.pdf")
 	heatmap.2( sampleDistMatrix, trace="none", col=colours)
 	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/119121020-36c35e00-ba2d-11eb-834b-987537efe117.png)
+![image](https://user-images.githubusercontent.com/34407101/144289021-d7d3694a-fe62-44e5-9fc9-08c83e1e6077.png)
 
 ###PCA_plot
 	pdf("pca_sample_distances.pdf")
