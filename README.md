@@ -9,8 +9,7 @@ Kenny Data
 		--right ./A006200108_131270_S158_L003_R2_001_val_2.fq.gz,./A006200108_131272_S159_L003_R2_001_val_2.fq.gz,./A006200108_131274_S160_L003_R2_001_val_2.fq.gz,./A006200108_131276_S161_L003_R2_001_val_2.fq.gz,./A006200108_131278_S162_L003_R2_001_val_2.fq.gz,./A006200108_131280_S163_L003_R2_001_val_2.fq.gz,./A006200108_131282_S164_L003_R2_001_val_2.fq.gz,./A006200108_131284_S165_L003_R2_001_val_2.fq.gz,./A006200108_131286_S166_L003_R2_001_val_2.fq.gz,./A006200108_131288_S167_L003_R2_001_val_2.fq.gz \
 	  --output ./trinity.out
 	  
-	/home/shangao/.conda/envs/Trinity/bin/TrinityStats.pl
-	![image](https://user-images.githubusercontent.com/34407101/124785496-2fa5d000-df47-11eb-93f9-0b0cd68661e7.png)
+![image](https://user-images.githubusercontent.com/34407101/144247486-95676f5d-89c2-4b6b-852a-ef534322aeec.png)
 
 
 ## 2.Filter
@@ -19,6 +18,9 @@ Kenny Data
 	
 ### cd-hit cluster 0.9 identy
 	/home/shangao/software/cd-hit-v4.8.1-2019-0228/cd-hit -i unigene.fasta -o unigene.cdhit.fasta -d 0 -M 100000 -T 48 -c 0.9
+	
+### remove the seq length less than 300bp
+	seqkit seq -m 300
 	
 ### check length
 	/NVME/Software/Assembly/trinityrnaseq-v2.11.0/util/misc/fasta_seq_length.pl unigene.cdhit.fasta > unigene.cdhit.fasta.length
@@ -36,6 +38,14 @@ Kenny Data
 	labels=c("100","200","300","400","500","600","700","800","900","1000","1100","1200","1
 	300","1400","1500","1600","1700","1800","1900",">=2000"))
 	dev.off()
+	
+	[length_distribution.pdf](https://github.com/LittleFrogHill/Protist/files/7635111/length_distribution.pdf)
+	
+### busco
+ ![image](https://user-images.githubusercontent.com/34407101/144270793-111b81aa-ca99-4cfe-9b3a-eb1f8246f9cb.png)
+
+### blobtools 
+ ![protist cumulative](https://user-images.githubusercontent.com/34407101/144270893-a68d6898-4e72-4a78-9a6a-e809db1cde66.png)
 
 ## 3.RSEM mapping
 	LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH
