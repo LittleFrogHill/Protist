@@ -21,7 +21,8 @@ Kenny Data
 	
 ### remove the seq length less than 300bp
 	seqkit seq -m 300
-	![image](https://user-images.githubusercontent.com/34407101/144271665-d36cc2c3-df98-4bab-9568-8c32e0a70d3c.png)
+
+![image](https://user-images.githubusercontent.com/34407101/144271665-d36cc2c3-df98-4bab-9568-8c32e0a70d3c.png)
 
 	
 ### check length
@@ -40,6 +41,7 @@ Kenny Data
 	labels=c("100","200","300","400","500","600","700","800","900","1000","1100","1200","1
 	300","1400","1500","1600","1700","1800","1900",">=2000"))
 	dev.off()
+	
 [length_distribution.pdf](https://github.com/LittleFrogHill/Protist/files/7635508/length_distribution.pdf)
 
 	
