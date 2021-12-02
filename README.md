@@ -173,9 +173,9 @@ https://jokergoo.github.io/ComplexHeatmap-reference/book/other-tricks.html
 ![image](https://user-images.githubusercontent.com/34407101/144298869-4b265913-7ddd-426b-9148-46fe01bfaf8c.png)
 
 
-## 1.Annotation with docker KOBAS
+## 8.Annotation with docker KOBAS
 
-	docker run -it -v /home/shangao:/gpfs -v /home/shangao/Data/kobas_DB/seq_pep:/opt/kobas-3.0/seq_pep -v /home/shangao/Data/kobas_DB/sqlite3:/opt/kobas-3.0/sqlite3 -v /NVME2/Scratch/gaoshan/:/NVME2/Scratch/gaoshan/ kobas
+	docker run -it -v /home/shangao:/gpfs -v /RAID/Data/databases/kobas_DB/seq_pep:/opt/kobas-3.0/seq_pep -v /RAID/Data/databases/kobas_DB/sqlite3:/opt/kobas-3.0/sqlite3 -v /NVME2/Scratch/gaoshan/:/NVME2/Scratch/gaoshan/ -v /RAID/Data/gaoshan/:/RAID/Data/gaoshan/  kobas
 	
 	annotate.py -i ./DEGs.adj.gene.filter500.fa.transdecoder.pep -s hsa -t fasta:pro -o anno_seq.tsv -e 1e-5 -r 1 -q /opt/kobas-3.0/sqlite3 -y /opt/kobas-3.0/seq_pep
 	
@@ -187,7 +187,7 @@ https://www.kegg.jp/kegg/catalog/org_list.html
 https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 ![image](https://user-images.githubusercontent.com/34407101/122572035-a5f09a00-d04d-11eb-8f0e-d8a04e6a7032.png)https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 
-## 8.clusterpr
+## 9.clusterpr
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
 https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html
@@ -263,10 +263,19 @@ Ptm_database
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
 
-	
-	
+## 10.	Phylogenetic
+### blast and prepare seqs from different species
 
-	
+### aln
+	mafft rad50.fa > rad50.aln
+### IQ-tree
+	iqtree-omp -s rad50.aln -st AA -nt 16 -quiet -bb 1000 -m TESTNEW -msub nuclear
+
+
+[results.pdf](https://github.com/LittleFrogHill/Protist/files/7640959/results.pdf)
+![image](https://user-images.githubusercontent.com/34407101/144400820-cf8f612e-c734-43e1-a975-c534ccfa1ba6.png)
+![image](https://user-images.githubusercontent.com/34407101/144400849-d8594782-cc34-43cf-afe5-c979d7417e13.png)
+
 	
 	
 	
