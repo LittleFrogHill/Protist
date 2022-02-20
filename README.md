@@ -185,10 +185,13 @@ https://jokergoo.github.io/ComplexHeatmap-reference/book/other-tricks.html
 https://www.kegg.jp/kegg/catalog/org_list.html
 ### If your species of interest is not available then you should choose the code for the closest-related species available
 https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
-![image](https://user-images.githubusercontent.com/34407101/122572035-a5f09a00-d04d-11eb-8f0e-d8a04e6a7032.png)https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
+https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
+![image](https://user-images.githubusercontent.com/34407101/154854832-d13f301d-d1c3-4c9c-9727-091d0ad76597.png)
+
 
 ## 9.clusterpr
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
+
 https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html
 https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
