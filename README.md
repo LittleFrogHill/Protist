@@ -104,6 +104,18 @@ Kenny Data
 	rld <- rlog(dds, blind=FALSE)
 	vsd <- vst(dds, blind=FALSE)
 	
+	CCG Sample ID    Sample Name
+	131270         Fisculla_asex_1
+	131272         Fisculla_asex_2
+	131274         Fisculla_asex_3
+	131276         Fisculla_asex_4
+	131278         Fisculla_asex_5
+	131280         Fisculla_sex_6
+	131282         Fisculla_sex_7
+	131284         Fisculla_sex_8
+	131286         Fisculla_sex_9
+	131288         Fisculla_sex_10	
+	
 ## 7.Plot
 
 ### MA_plot
