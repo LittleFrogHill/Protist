@@ -201,7 +201,7 @@ https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 ![image](https://user-images.githubusercontent.com/34407101/154854832-d13f301d-d1c3-4c9c-9727-091d0ad76597.png)
 
 
-## 9.clusterpr
+## 9.clusterProfiler
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
 
 https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
@@ -218,13 +218,92 @@ Human_database
 	gene <- names(geneList)[abs(geneList) > 0.5]
 	library(clusterProfiler)
 	library(org.Hs.eg.db)
+	
+### KEGG enrichment
+#### KEGG pathway over-representation analysis
 	kk <- enrichKEGG(gene         = gene,organism     = 'hsa',pvalueCutoff = 0.05)
 	head(kk)
 	
-### barplot
-![image](https://user-images.githubusercontent.com/34407101/123746111-7c3b3c80-d8b1-11eb-8b65-5d1c10a29a63.png)
+	pdf("KEGG_enrichment.pdf",width=8)
+	dotplot(kk, showCategory=30) + ggtitle("KEGG pathway over-representation analysis")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171643777-3fb91524-2ff7-41e2-a41f-9031c7497585.png)
+
+
+#### KEGG pathway gene set enrichment analysis
+	 kk2 <- gseKEGG(geneList = geneList,organism = 'hsa',minGSSize = 20,maxGSSize=50,pvalueCutoff = 0.05,verbose = FALSE)
+	 kk2$Description
+	 [1] "Epstein-Barr virus infection"                 
+	 [2] "Proteasome"                                   
+	 [3] "Toxoplasmosis"                                
+	 [4] "DNA replication"                              
+	 [5] "Citrate cycle (TCA cycle)"                    
+	 [6] "Gap junction"                                 
+	 [7] "Ribosome biogenesis in eukaryotes"            
+	 [8] "Cell cycle"                                   
+	 [9] "Lipid and atherosclerosis"                    
+	[10] "Chemical carcinogenesis - receptor activation"
+	[11] "Cysteine and methionine metabolism"           
+	[12] "Glutathione metabolism"                       
+	[13] "N-Glycan biosynthesis"                        
+	[14] "Tight junction"                               
+	[15] "cAMP signaling pathway"                       
+	[16] "Pathogenic Escherichia coli infection"        
+	[17] "Arginine and proline metabolism"              
+	[18] "Measles"                                      
+	[19] "Oocyte meiosis"                               
+	[20] "Thyroid hormone signaling pathway"            
+	[21] "Phagosome"                                    
+	[22] "Adrenergic signaling in cardiomyocytes"
+
+	pdf("KEGG_gse_enrichment.pdf",width=7.5)
+	dotplot(kk2, showCategory=30) + ggtitle("KEGG pathway gene set enrichment analysis")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171643378-9bd8a86a-98f8-451e-b1c5-712ff5cd4baa.png)
+
+
+#### KEGG module over-representation analysis
+	mkk <- enrichMKEGG(gene = gene,organism = 'hsa',pvalueCutoff = 1,qvalueCutoff = 1,keyType= "kegg")
+	![image](https://user-images.githubusercontent.com/34407101/171635548-13a962b6-c849-421b-ad35-df0ec1ce8c9a.png)
+
+#### KEGG module gene set enrichment analysis
+	mkk2 <- gseMKEGG(geneList = geneList,organism = 'hsa',pvalueCutoff = 1)
+	![image](https://user-images.githubusercontent.com/34407101/171635836-418d2848-a1a2-407b-a7f7-aa01b89b8063.png)
+
+#### KEGG Pathway
+	library("pathview")
+	hsa04114 <- pathview(gene.data  = geneList,pathway.id = "hsa04114",species    = "hsa", limit=list(gene = 2, cpd = 1))
+	hsa03030 <- pathview(gene.data  = geneList,pathway.id = "hsa03030",species    = "hsa", limit=list(gene = 2, cpd = 1))
+	hsa03430 <- pathview(gene.data  = geneList,pathway.id = "hsa03430",species    = "hsa", limit=list(gene = 2, cpd = 1))
+	hsa03420 <- pathview(gene.data  = geneList,pathway.id = "hsa03420",species    = "hsa", limit=list(gene = 2, cpd = 1))
+	hsa04110 <- pathview(gene.data  = geneList,pathway.id = "hsa04110",species    = "hsa", limit=list(gene = 2, cpd = 1))
+	
+### GO enrichment
+#### GO classification
+	ggo <- groupGO(gene     = gene,OrgDb    = org.Hs.eg.db,ont      = "bp",level    = 3, readable = TRUE)
+![image](https://user-images.githubusercontent.com/34407101/171648035-3f8a58c4-5000-4cf7-92bc-eca5bb623e67.png)
+![image](https://user-images.githubusercontent.com/34407101/171654203-42944571-f30d-4374-bf6a-eb604575c5cd.png)
+	
+#### GO over-representation analysis
+	ego <- enrichGO(gene          = gene,universe      = names(geneList),OrgDb         = org.Hs.eg.db,ont           = "bp",pAdjustMethod = "BH",qvalueCutoff  = 0.05,readable      = TRUE)
+	
+	pdf("GO_enrichment.pdf",width=30)
+	goplot(ego)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171630414-c20bc4ec-939e-4708-9df1-acf4971d3344.png)
+
+#### GO Gene Set Enrichment Analysis (GSEA)
+	ego3 <- gseGO(geneList=geneList,OrgDb=org.Hs.eg.db,ont= "bp",minGSSize=100,maxGSSize= 500,pvalueCutoff = 0.05,verbose = FALSE)
+
+
+
+
 ### dotplot
-![image](https://user-images.githubusercontent.com/34407101/123746159-8cebb280-d8b1-11eb-9e27-9d8bd082c41a.png)
+
+
+
+
+
 ### Network
 	> pdf('Network1.pdf',pointsize=2,width=100,height=100)
 	> cnetplot(edox, foldChange=geneList,showCategory=20)
