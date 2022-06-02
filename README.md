@@ -203,7 +203,6 @@ https://agbase-docs.readthedocs.io/en/latest/kobas/using_kobas_cmd.html
 
 ## 9.clusterProfiler
 http://yulab-smu.top/clusterProfiler-book/chapter12.html#bar-plot
-
 https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html
 https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
@@ -261,18 +260,24 @@ Human_database
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171643378-9bd8a86a-98f8-451e-b1c5-712ff5cd4baa.png)
 
+	pdf("KEGG_GSEA.pdf")
+	gseaplot2(kk2, geneSetID = c(4,19,8), pvalue_table = TRUE,color = c("#E495A5", "#86B875", "#7DB0DD"), ES_geom = "dot")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171684961-66c7ad25-8159-41c9-9bb4-001827d90828.png)
+
 
 #### KEGG module over-representation analysis
 	mkk <- enrichMKEGG(gene = gene,organism = 'hsa',pvalueCutoff = 1,qvalueCutoff = 1,keyType= "kegg")
-	![image](https://user-images.githubusercontent.com/34407101/171635548-13a962b6-c849-421b-ad35-df0ec1ce8c9a.png)
+![image](https://user-images.githubusercontent.com/34407101/171635548-13a962b6-c849-421b-ad35-df0ec1ce8c9a.png)
 
 #### KEGG module gene set enrichment analysis
 	mkk2 <- gseMKEGG(geneList = geneList,organism = 'hsa',pvalueCutoff = 1)
-	![image](https://user-images.githubusercontent.com/34407101/171635836-418d2848-a1a2-407b-a7f7-aa01b89b8063.png)
+![image](https://user-images.githubusercontent.com/34407101/171635836-418d2848-a1a2-407b-a7f7-aa01b89b8063.png)
 
 #### KEGG Pathway
 	library("pathview")
 	hsa04114 <- pathview(gene.data  = geneList,pathway.id = "hsa04114",species    = "hsa", limit=list(gene = 2, cpd = 1))
+![image](https://user-images.githubusercontent.com/34407101/171658956-03787493-36c4-428f-833f-f5183fb99eec.png)
 	hsa03030 <- pathview(gene.data  = geneList,pathway.id = "hsa03030",species    = "hsa", limit=list(gene = 2, cpd = 1))
 	hsa03430 <- pathview(gene.data  = geneList,pathway.id = "hsa03430",species    = "hsa", limit=list(gene = 2, cpd = 1))
 	hsa03420 <- pathview(gene.data  = geneList,pathway.id = "hsa03420",species    = "hsa", limit=list(gene = 2, cpd = 1))
@@ -280,23 +285,40 @@ Human_database
 	
 ### GO enrichment
 #### GO classification
-	ggo <- groupGO(gene     = gene,OrgDb    = org.Hs.eg.db,ont      = "bp",level    = 3, readable = TRUE)
+	ggo <- groupGO(gene = gene,OrgDb= org.Hs.eg.db,ont= "bp",level= 3, readable = TRUE)
+	pdf("GO_group.pdf",height=20)
+	barplot(ggo, showCategory=100,drop=TRUE) + ggtitle("GO classification level=3 100 items")
+	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171648035-3f8a58c4-5000-4cf7-92bc-eca5bb623e67.png)
 ![image](https://user-images.githubusercontent.com/34407101/171654203-42944571-f30d-4374-bf6a-eb604575c5cd.png)
 	
+	ggo2 <- groupGO(gene= gene,OrgDb= org.Hs.eg.db,ont= "bp",level= 2, readable = TRUE)
+	pdf("GO_group_level2.pdf")
+	barplot(ggo2, showCategory=100,drop=TRUE) + ggtitle("GO classification level=2")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171659558-f8bac429-971c-43b3-b878-8b4886c8ed6a.png)
+
 #### GO over-representation analysis
-	ego <- enrichGO(gene          = gene,universe      = names(geneList),OrgDb         = org.Hs.eg.db,ont           = "bp",pAdjustMethod = "BH",qvalueCutoff  = 0.05,readable      = TRUE)
-	
+	ego <- enrichGO(gene= gene,universe= names(geneList),OrgDb= org.Hs.eg.db,ont= "bp",pAdjustMethod = "BH",qvalueCutoff = 0.05,readable= TRUE)
 	pdf("GO_enrichment.pdf",width=30)
 	goplot(ego)
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171630414-c20bc4ec-939e-4708-9df1-acf4971d3344.png)
-
+	pdf("GO_enrich_cnetplot.pdf")
+	cnetplot(ego, categorySize="pvalue", foldChange=geneList,showCategory="negative regulation of cell cycle G2/M phase transition")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171679011-f100607a-cf5e-4e05-8517-18148573a8b5.png)
+	pdf("GO_enrich_graph.pdf",width=50,height=50)
+	plotGOgraph(ego)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171681172-7f13546b-b614-4c2c-989f-d660b6f2a2ac.png)
+	
 #### GO Gene Set Enrichment Analysis (GSEA)
 	ego3 <- gseGO(geneList=geneList,OrgDb=org.Hs.eg.db,ont= "bp",minGSSize=100,maxGSSize= 500,pvalueCutoff = 0.05,verbose = FALSE)
-
-
-
+	pdf("GO_GSEA.pdf")
+	gseaplot2(ego3, geneSetID = (1,13,118), pvalue_table = TRUE,color = c("#E495A5", "#86B875", "#7DB0DD"), ES_geom = "dot")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/171684448-b3bc8cc6-0222-4d05-9d2f-efc386baf1d2.png)
 
 ### dotplot
 
