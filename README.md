@@ -1,5 +1,5 @@
 # Protist
-Kenny Data
+## Fisculla terrestris Transcription Data Kenny
 
 ## 1.Trinity assembly
 	LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH
