@@ -166,10 +166,11 @@
 	library( "RColorBrewer" )
 	colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 	
-	pdf("heatmap_sample_distances.pdf")
-	heatmap.2( sampleDistMatrix, trace="none", col=colours)
+	pdf("heatmap_sample_distances_withbar.pdf")
+	heatmap.2( sampleDistMatrix, trace="none", col=colours,dendrogram = "row",ColSideColors =plot_color,srtCol = 45, offsetCol = -0.5,cexRow = 0.8, cexCol = 1.0)
 	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/144289021-d7d3694a-fe62-44e5-9fc9-08c83e1e6077.png)
+![image](https://user-images.githubusercontent.com/34407101/171907670-1a1c0172-1961-43f9-8294-a5f62913d28c.png)
+
 
 ### PCA_plot
 	pdf("pca_sample_distances.pdf")
