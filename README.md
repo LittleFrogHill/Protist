@@ -41,14 +41,30 @@ Kenny Data
 	labels=c("100","200","300","400","500","600","700","800","900","1000","1100","1200","1
 	300","1400","1500","1600","1700","1800","1900",">=2000"))
 	dev.off()
-	
+![image](https://user-images.githubusercontent.com/34407101/171874537-00e64280-cf09-4e9a-95a3-33abbbc214b4.png)
 [length_distribution.pdf](https://github.com/LittleFrogHill/Protist/files/7635508/length_distribution.pdf)
-
 	
 ### busco
+	busco -i ../new_reference/unigene.cdhit0.9.over300.fasta \
+		--auto-lineage-euk \
+		-o busco \
+		-m tran \
+		--cpu 40
+
  ![image](https://user-images.githubusercontent.com/34407101/144270793-111b81aa-ca99-4cfe-9b3a-eb1f8246f9cb.png)
 
 ### blobtools 
+	/home/shangao/Software/blobtoolkit/blobtools2/blobtools create \
+	--fasta ../new_reference/unigene.cdhit0.9.fasta \
+	/home/shangao/Data/clean_data_protsist/trinity/longest_transcription/blobtools/protist
+
+	/home/shangao/Software/blobtoolkit/blobtools2/blobtools add \
+	--taxrule bestsumorder \
+	--taxdump /RAID/Data/databases/taxdump/ \
+	--hits /home/shangao/Data/clean_data_protsist/trinity/longest_transcription/blobtools/longest.ncbi1.blastn.out \
+	--busco busco/run_eukaryota_odb10/full_table.tsv \
+	/home/shangao/Data/clean_data_protsist/trinity/longest_transcription/blobtools/protist
+	
  ![protist cumulative](https://user-images.githubusercontent.com/34407101/144270893-a68d6898-4e72-4a78-9a6a-e809db1cde66.png)
 
 ## 3.RSEM mapping
@@ -79,12 +95,12 @@ Kenny Data
 	nohup sh rsem_shell/$i.sh > rsem_shell/$i.log &
 	done
 
-## 4.merge
+## 4.Merge transcription
 	find * -name '*.genes.results'> merge_result/merged.genes.quant.file
 	find * -name '*.isoforms.results'> merge_result/merged.isoform.quant.file
 	/home/shangao/Software/Assembly/trinityrnaseq-v2.11.0/util/misc/merge_RSEM_output_to_matrix.pl --rsem_files merge_result/merged.genes.quant.file --mode counts > merge_result/merged.genes.result.file
 
-## 5.DEseq
+## 5.DEseq calculate DEGs
 	R
 	library('DESeq2')
 	colData <- read.table('sample.list', header=T,row.names=1)
@@ -96,7 +112,7 @@ Kenny Data
 	resdata <- merge(as.data.frame(res), as.data.frame(counts(dds2, normalized=TRUE)),by='row.names',sort=FALSE)
 	write.table(file='DEseq.result.gene',resdata,col.names=T,row.names=F,sep=',',quote=F)
 	
-## 6.get q<0.05 DEGs
+## 6. Filter q<0.05 DEGs
 	head -n 1 DEseq.result.gene |sed 's/,/\t/g' > gene.title
 	sed 's/,/\t/g' DEseq.result.gene |awk '$7<= 0.05 {print$0}' > gene
 	cat gene.title gene > DEseq.adj.gene
@@ -116,7 +132,7 @@ Kenny Data
 	131286         Fisculla_sex_9
 	131288         Fisculla_sex_10	
 	
-## 7.Plot
+## 7.Plots
 
 ### MA_plot
 
@@ -207,7 +223,7 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html
 https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 
-Human_database
+### Human_database annotated
 
 	R
 	d <- read.table('hsa_anno.out')
@@ -320,11 +336,24 @@ Human_database
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171684448-b3bc8cc6-0222-4d05-9d2f-efc386baf1d2.png)
 
-### dotplot
+### Ptm_database
 
-
-
-
+	d <- read.table('ptm.annoDEGs.out')
+	geneList <- d[,2]
+	names(geneList) <- as.character(d[,1])
+	geneList <- sort(geneList, decreasing = TRUE)
+	gene <- names(geneList)[abs(geneList) > 0.5]
+	library(clusterProfiler)
+	
+	pdf('bar1.pdf')
+	barplot(kk1, showCategory=20)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746304-bf95ab00-d8b1-11eb-97d8-0d40c73ab091.png)
+	
+	pdf('dot.pdf')
+	dotplot(kk, showCategory=30) + ggtitle("dotplot for ptm_database")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
 
 ### Network
 	> pdf('Network1.pdf',pointsize=2,width=100,height=100)
@@ -356,28 +385,6 @@ Human_database
 	> pdf('Enrich.pdf',pointsize=5,width=50,height=50)
 	> emapplot(kk, pie_scale=1.5,layout="kk")
 	> dev.off()
-
-	
-Ptm_database
-	
-	d <- read.table('ptm.annoDEGs.out')
-	geneList <- d[,2]
-	names(geneList) <- as.character(d[,1])
-	geneList <- sort(geneList, decreasing = TRUE)
-	gene <- names(geneList)[abs(geneList) > 0.5]
-	library(clusterProfiler)
-	
-	
-	
-	pdf('bar1.pdf')
-	barplot(kk1, showCategory=20)
-	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/123746304-bf95ab00-d8b1-11eb-97d8-0d40c73ab091.png)
-	
-	pdf('dot.pdf')
-	dotplot(kk, showCategory=30) + ggtitle("dotplot for ptm_database")
-	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
 
 ## 10.	Phylogenetic
 ### blast and prepare seqs from different species
