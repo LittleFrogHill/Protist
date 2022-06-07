@@ -387,7 +387,38 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	> emapplot(kk, pie_scale=1.5,layout="kk")
 	> dev.off()
 
-## 10.	Phylogenetic
+## 10. Meiosis-related genes Blast
+### download the Meiosis-related genes and blastp to our database
+	cat blastp2pro.sh
+	for i in Acrispumella_msimbaziensis \
+		Apoikiospumella_mondseeiensis \
+		Cornospumella_fuschlensis \
+		Dinobryon_sp_1 \
+		Dinobryon_sp_2 \
+		Epipyxis_sp \
+		Ochromonas_or_Spumella_sp \
+		Pedospumella_encystans \
+		Pedospumella_sinomuralis \
+		Poterioochromonas_malhamensis \
+		Poteriospumella_lacustris_1 \
+		Poteriospumella_lacustris_2 \
+		Poteriospumella_lacustris_3 \
+		Spumella_bureschii \
+		Spumella_lacusvadosi \
+		Spumella_vulgaris \
+		Synura_sp \
+		Uroglena_sp
+	do
+	cd $i
+	cat *.fasta > $i.fasta
+	sed -i 's/\ /-/g' $i.fasta
+	#makeblastdb -in $i.fasta -dbtype prot -out $i
+	blastp -db /home/shangao/Data/clean_data_protsist/trinity/longest_transcription/trandecoder/unigene.cdhit0.9.fasta.transdecoder.pep.cdhit -query $i.fasta -max_target_seqs 1 -outfmt 6 -evalue 1e-4 -num_threads 10 > ../$i.2pro.blastn.out
+	cd ..
+	done
+![image](https://user-images.githubusercontent.com/34407101/172344425-d04b5658-1eda-4788-8243-cb331d41aa32.png)
+
+## 11.	Phylogenetic
 ### blast and prepare seqs from different species
 
 ### aln
