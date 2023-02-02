@@ -432,14 +432,12 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 ![image](https://user-images.githubusercontent.com/34407101/144400849-d8594782-cc34-43cf-afe5-c979d7417e13.png)
 
 
-[cluster_boxplots_log2FC1.pdf](https://github.com/LittleFrogHill/Protist/files/10569119/cluster_boxplots_log2FC1.pdf)
-[clustering_dendrogram.pdf](https://github.com/LittleFrogHill/Protist/files/10569120/clustering_dendrogram.pdf)
-[dot_ego1.pdf](https://github.com/LittleFrogHill/Protist/files/10569122/dot_ego1.pdf)
-[dot_ego1_filter.pdf](https://github.com/LittleFrogHill/Protist/files/10569123/dot_ego1_filter.pdf)
-[dot_ego1_simple.pdf](https://github.com/LittleFrogHill/Protist/files/10569125/dot_ego1_simple.pdf)
-[dot_ego2.pdf](https://github.com/LittleFrogHill/Protist/files/10569127/dot_ego2.pdf)
-[dot_ego2_filter.pdf](https://github.com/LittleFrogHill/Protist/files/10569128/dot_ego2_filter.pdf)
-[dot_ego2_simple.pdf](https://github.com/LittleFrogHill/Protist/files/10569129/dot_ego2_simple.pdf)
+![image](https://user-images.githubusercontent.com/34407101/216330344-aa3f8ee0-5775-4f98-8b05-321ebbfdf2c5.png)
+![image](https://user-images.githubusercontent.com/34407101/216330407-570da456-1aa5-4f48-889f-6ef852eb2e9d.png)
+![image](https://user-images.githubusercontent.com/34407101/216330464-4437b9fa-0c6e-4436-8516-cc1593a7abe8.png)
+![image](https://user-images.githubusercontent.com/34407101/216330525-da10e224-4fff-4cb0-b220-495bfacb7e4e.png)
+![image](https://user-images.githubusercontent.com/34407101/216330589-ed7fcec9-428b-4f88-88cf-87301386169a.png)
 
-	
+
+
 	
