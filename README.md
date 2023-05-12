@@ -432,8 +432,7 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 
 ## 12.	clustertree(https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect)
 
-![image](https://user-images.githubusercontent.com/34407101/216330344-aa3f8ee0-5775-4f98-8b05-321ebbfdf2c5.png)
-![image](https://user-images.githubusercontent.com/34407101/216330407-570da456-1aa5-4f48-889f-6ef852eb2e9d.png)
+
 ![image](https://user-images.githubusercontent.com/34407101/216330464-4437b9fa-0c6e-4436-8516-cc1593a7abe8.png)
 ![image](https://user-images.githubusercontent.com/34407101/216330525-da10e224-4fff-4cb0-b220-495bfacb7e4e.png)
 ![image](https://user-images.githubusercontent.com/34407101/216330589-ed7fcec9-428b-4f88-88cf-87301386169a.png)
@@ -513,6 +512,8 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	bline(h=80/100*max(hc$height), lty = 2, col="grey")
 	dev.off()
 	
+![image](https://user-images.githubusercontent.com/34407101/216330344-aa3f8ee0-5775-4f98-8b05-321ebbfdf2c5.png)
+
 	# Make factor_labeling.txt for goseq
 	data.frame(my_transcript_partition_assignments) %>%
 	rownames_to_column(var = "transcripts") -> factor_labeling
@@ -553,6 +554,8 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	grid.arrange(grobs = p, ncol = 2)
 	dev.off()
 	
+![image](https://user-images.githubusercontent.com/34407101/216330407-570da456-1aa5-4f48-889f-6ef852eb2e9d.png)
+
 	# GO import and heatmap
 	library(clusterProfiler)
 	library(org.Hs.eg.db)
@@ -610,7 +613,10 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	pheatmap(heat2_exp, scale="row", cluster_cols = F,  cluster_rows = F,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,main="sexual reproduction",fontsize_row=5)
 	dev.off()
 cluster1
+
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/fefdd789-9689-42aa-b4b3-a4a61afd3cbf)
+
 cluster2
+
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/f73e1626-5e60-42c8-af1e-1085baeb4ee6)
 
