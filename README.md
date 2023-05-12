@@ -620,3 +620,9 @@ cluster2
 
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/f73e1626-5e60-42c8-af1e-1085baeb4ee6)
 
+supplementary add figures in pdf files
+	GO_enrichment_cluster1.pdf
+	GO_enrichment_cluster2.pdf
+	KEGG_enrichment_cluster1.pdf
+	KEGG_enrichment_cluster2.pdf
+
