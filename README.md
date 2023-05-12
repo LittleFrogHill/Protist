@@ -432,11 +432,6 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 
 ## 12.	clustertree(https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect)
 
-
-![image](https://user-images.githubusercontent.com/34407101/216330464-4437b9fa-0c6e-4436-8516-cc1593a7abe8.png)
-![image](https://user-images.githubusercontent.com/34407101/216330525-da10e224-4fff-4cb0-b220-495bfacb7e4e.png)
-![image](https://user-images.githubusercontent.com/34407101/216330589-ed7fcec9-428b-4f88-88cf-87301386169a.png)
-
 	conda activate BRAKER
 	R
 	library(tximport)
