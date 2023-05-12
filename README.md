@@ -426,11 +426,11 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 ### IQ-tree
 	iqtree-omp -s rad50.aln -st AA -nt 16 -quiet -bb 1000 -m TESTNEW -msub nuclear
 
-
 [results.pdf](https://github.com/LittleFrogHill/Protist/files/7640959/results.pdf)
 ![image](https://user-images.githubusercontent.com/34407101/144400820-cf8f612e-c734-43e1-a975-c534ccfa1ba6.png)
 ![image](https://user-images.githubusercontent.com/34407101/144400849-d8594782-cc34-43cf-afe5-c979d7417e13.png)
 
+## 12.	clustertree(https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect)
 
 ![image](https://user-images.githubusercontent.com/34407101/216330344-aa3f8ee0-5775-4f98-8b05-321ebbfdf2c5.png)
 ![image](https://user-images.githubusercontent.com/34407101/216330407-570da456-1aa5-4f48-889f-6ef852eb2e9d.png)
@@ -438,6 +438,179 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 ![image](https://user-images.githubusercontent.com/34407101/216330525-da10e224-4fff-4cb0-b220-495bfacb7e4e.png)
 ![image](https://user-images.githubusercontent.com/34407101/216330589-ed7fcec9-428b-4f88-88cf-87301386169a.png)
 
-
-https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect
+	conda activate BRAKER
+	R
+	library(tximport)
+	library(DESeq2)
+	library(ggplot2)
+	library(ggrepel)
+	library(dendextend)
+	library(grid)
+	library(gridExtra)
+	library(tibble)
+	library(dplyr)
+	library(tidyr)
+	library(stringr)
+	library(forcats)
+	library(ochRe)
+	library(ggpubr)
+	library(goseq)
+	library(GO.db)
+	library(GOfuncR)
+	library(qvalue)
+	library(stringr)
+	library(ComplexHeatmap)
+	library(RColorBrewer)
+	library(circlize)
+	library(seqinr)
+	library(UpSetR)
+	library(purrr)
+	# Calculate DEGs
+	colData <- read.table('../../../sample.list', header=T,row.names=1)
+	countData <-read.table('../../../merged.genes.result.file', row.names='id',header=T)
+	dds <- DESeqDataSetFromMatrix(countData = round(countData),colData = colData, design = ~ group)
+	dds <- dds[ rowSums(counts(dds)) > 50, ]
+	dds2 <- DESeq(dds)
+	res <- results(dds2)
+	resdata <- merge(as.data.frame(res), as.data.frame(counts(dds2, normalized=TRUE)),by='row.names',sort=FALSE)
+	rld <- rlog(dds, blind=FALSE)
 	
+	# Extracting transformed count values
+	vsd <- vst(dds, blind=FALSE)
+	vsd_matrix <- assay(vsd)
+	
+	# Cluster
+	# Cutoff readcount>50, padj 0.05
+	as.data.frame(res) %>%
+	filter(padj < 0.05) -> res_diff
+	as.data.frame(res) %>% filter(padj < 0.05) -> res_diff
+	head(res)
+	head(res_diff)
+	dge_set <- c(rownames(res_diff))
+	dge_set <- unique(dge_set)
+	
+	# Generate z-score matrix for heatmaps
+	vsd_matrix_dge <- vsd_matrix[dge_set,]
+	heat <- t(scale(t(vsd_matrix)))
+	heat <- heat[dge_set,]
+	
+	# Clusters rows by Pearson correlation as distance method
+	hc <- hclust(as.dist(1 - cor(t(as.matrix(vsd_matrix_dge)))))
+	my_transcript_partition_assignments <- cutree(hc, h = 80/100*max(hc$height))
+	
+	# Visualise dendrogram with clusters
+	clust.cutree <- dendextend:::cutree(as.dendrogram(hc), h = 80/100*max(hc$height), order_clusters_as_data = FALSE)
+	idx <- order(names(clust.cutree))
+	clust.cutree <- clust.cutree[idx]
+	idx <- order(names(clust.cutree))
+	clust.cutree <- clust.cutree[idx]
+	df.merge <- merge(my_transcript_partition_assignments, clust.cutree, by = "row.names")
+	df.merge.sorted <- df.merge[order(df.merge$y),]
+	lbls <- unique(df.merge.sorted$x)
+	dend1 <-color_branches(as.dendrogram(hc), h = 80/100*max(hc$height), groupLabels = lbls)
+	pdf(file = paste0("./clustering_dendrogram.1.pdf"), width = 12, height = 5)
+	lot(dend1, leaflab = "none")
+	bline(h=80/100*max(hc$height), lty = 2, col="grey")
+	dev.off()
+	
+	# Make factor_labeling.txt for goseq
+	data.frame(my_transcript_partition_assignments) %>%
+	rownames_to_column(var = "transcripts") -> factor_labeling
+	colnames(factor_labeling) <- c("transcript", "cluster")
+	#write.table(factor_labeling, 
+	#            file = paste0(mydir, "/Module_5/GO_analysis/factor_labeling.txt"),
+	#            row.names = FALSE,
+	#            col.names = FALSE,
+	#            quote = FALSE,
+	#            sep = "\t")
+	
+	# Make list of clusters
+	clusterlist <- list()
+	for (i in c(1:max(my_transcript_partition_assignments))) {
+	  cluster <- heat[(my_transcript_partition_assignments == i),]
+	  clusterlist[[i]] <- cluster
+	}
+
+	# Plot clusters as boxplots
+	p <- list()
+	splan <- 3 - 1L
+	for (i in 1:max(my_transcript_partition_assignments)) {
+	   box <- rownames_to_column(as.data.frame(clusterlist[[i]]), var = "transcript")
+	   box_longer <- pivot_longer(box, cols = !transcript, names_to = "sample")
+	  box_longer %>%filter(sample == "X131270_S158" | sample == "X131272_S159" | sample == "X131274_S160"| sample == "X131276_S161" | sample == "X131278_S162") %>%
+	  mutate(cat = "asex") -> box_longer1
+	  box_longer %>% filter(sample == "X131280_S163" | sample == "X131282_S164" | sample == "X131284_S165"| sample == "X131286_S166" | sample == "X131288_S167") %>%
+	  mutate(cat = "sex") -> box_longer2
+	  comb <- rbind(box_longer1, box_longer2)
+	  comb$cat <-factor(comb$cat, levels = c("asex", "sex"))
+	 g <- ggplot(comb, aes(x = cat, y = value)) +geom_boxplot(outlier.size = 0,outlier.shape = NA,alpha = 0.5,color = "#252A52",fill = "#252A52") +stat_smooth(aes(x = cat, y = value, group = "#252A52"), color = "#252A52",se = TRUE,method = "lm", formula = y~poly(x, splan)) +ggtitle(paste("cluster", i, "|", "contigs:", nrow(clusterlist[[i]]))) +scale_y_continuous(limits = c(-2, 2)) +
+	      ylab("z-score") +
+	      xlab(NULL) +
+	      theme(legend.position = "none", panel.background = element_rect(colour = "darkgrey", size=1))
+	    p[[i]] <- ggplotGrob(g)
+	  }
+	pdf(file = paste0("./cluster_boxplots_log2FC1.pdf"), width = 15, height = 3)
+	grid.arrange(grobs = p, ncol = 2)
+	dev.off()
+	
+	# GO import and heatmap
+	library(clusterProfiler)
+	library(org.Hs.eg.db)
+	d1 <- read.table('cluster1.out')
+	d2 <- read.table('cluster2.out')
+	geneList1 <- d1[,2]
+	geneList2 <- d2[,2]
+	names(geneList1) <- as.character(d1[,1])
+	names(geneList2) <- as.character(d2[,1])
+	geneList1 <- sort(geneList1, decreasing = TRUE)
+	geneList2 <- sort(geneList2, decreasing = TRUE)
+	gene1 <- names(geneList1)[abs(geneList1) > 0]
+	gene2 <- names(geneList2)[abs(geneList2) > 0]
+	ego1 <- enrichGO(gene= gene1,universe= total_gene,OrgDb= org.Hs.eg.db,ont= "all",pAdjustMethod = "BH",pvalueCutoff=0.05,readable= TRUE)
+	ego2 <- enrichGO(gene= gene2,universe= total_gene,OrgDb= org.Hs.eg.db,ont= "all",pAdjustMethod = "BH",pvalueCutoff=0.05,readable= TRUE)
+	kk1 <- enrichKEGG(gene=gene1,organism= 'hsa',pvalueCutoff = 0.05)
+	kk2 <- enrichKEGG(gene=gene2,organism= 'hsa',pvalueCutoff = 0.05)
+	
+	library(enrichplot)
+	pdf("KEGG_enrichment_cluster1.pdf",width=10,height=22)
+	dotplot(kk1, showCategory=500) + ggtitle("KEGG pathway analysis of Cluster1")
+	dev.off()
+	pdf("KEGG_enrichment_cluster2.pdf",width=10,height=22)
+	dotplot(kk2, showCategory=500) + ggtitle("KEGG pathway analysis of Cluster2")
+	dev.off() 
+	
+	pdf("GO_enrichment_cluster2.pdf",height=25)
+	dotplot(ego2, split="ONTOLOGY",showCategory=300,  font.size = 7) + facet_grid(ONTOLOGY~., scale="free", space = "free")+ ggtitle("GO term of Cluster2")
+	dev.off()                                  
+	pdf("GO_enrichment_cluster1.pdf",height=25)
+	dotplot(ego1, split="ONTOLOGY",showCategory=300,  font.size = 7) + facet_grid(ONTOLOGY~., scale="free", space = "free")+ ggtitle("GO term of Cluster1")
+	dev.off()
+	
+	write.table(ego1, file = "GO_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(ego2, file = "GO_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(kk2, file = "KEGG_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(kk1, file = "KEGG_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+
+	ggo1 <- groupGO(gene = gene1,OrgDb= org.Hs.eg.db,ont= "bp",level= 3)
+	ggo2 <- groupGO(gene = gene2,OrgDb= org.Hs.eg.db,ont= "bp",level= 3)
+	write.table(ggo1, file = "ggo_cluster1_level3.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(ggo2, file = "ggo_cluster2_level3.txt",sep = "\t", row.names = F,col.names = T)
+	
+	heat1 <- read.table('heatmap/ggo_cluster1_exp',col.name=c("genename","X131270_S158","X131272_S159","X131274_S160","X131276_S161","X131278_S162","X131280_S163","X131282_S164","X131284_S165","X131286_S166","X131288_S167"))
+	heat1_exp<-heat1[,2:11]
+	row.names(heat1_exp) <- AnnotationDbi::select(org.Hs.eg.db, keys=as.character(heat1$genename),columns=c("ENTREZID","GENENAME"), keytype="ENTREZID")$GENENAME
+	pdf("GO_heatmap_cluster1.pdf")
+	pheatmap(heat1_exp, scale="row", cluster_cols = F,  cluster_rows = F,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,main="sexual reproduction")
+	dev.off()
+
+	heat2 <- read.table('heatmap/ggo_cluster2_exp',col.name=c("genename","X131270_S158","X131272_S159","X131274_S160","X131276_S161","X131278_S162","X131280_S163","X131282_S164","X131284_S165","X131286_S166","X131288_S167"))
+	heat2_exp<-heat2[,2:11]
+	row.names(heat2_exp) <- AnnotationDbi::select(org.Hs.eg.db, keys=as.character(heat2$genename),columns=c("ENTREZID","GENENAME"), keytype="ENTREZID")$GENENAME
+	pdf("GO_heatmap_cluster2.pdf")
+	pheatmap(heat2_exp, scale="row", cluster_cols = F,  cluster_rows = F,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,main="sexual reproduction",fontsize_row=5)
+	dev.off()
+cluster1
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/fefdd789-9689-42aa-b4b3-a4a61afd3cbf)
+cluster2
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/f73e1626-5e60-42c8-af1e-1085baeb4ee6)
+
