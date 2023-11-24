@@ -132,7 +132,7 @@
 	131286         Fisculla_sex_9
 	131288         Fisculla_sex_10	
 	
-## 7.Plots
+## 7.Sequence Plots
 
 ### MA_plot
 
@@ -616,8 +616,175 @@ cluster2
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/f73e1626-5e60-42c8-af1e-1085baeb4ee6)
 
 supplementary add figures in pdf files
+
 	GO_enrichment_cluster1.pdf
 	GO_enrichment_cluster2.pdf
 	KEGG_enrichment_cluster1.pdf
 	KEGG_enrichment_cluster2.pdf
 
+## 13. Annotated by eggnog-mapper
+	library(stringr)
+	require(DOSE)
+	require(clusterProfiler)
+	library(enrichplot)
+	library(ggplot2)
+	library(tibble)
+	library(org.Fterrestris.eg.db)
+	library(GOSemSim)
+	library(simplifyEnrichment)
+
+ 
+	# data read
+ 	egg<-read.delim("pro.emapper.annotations")
+	d1 <- read.table('cluster1')
+	d2 <- read.table('cluster2')
+	gene1<-as.matrix(d1)
+	gene2<-as.matrix(d2)
+
+  	# GO construct
+	gene_ids <- egg$query
+	eggnog_lines_with_go <- egg$GOs!='-'
+	eggnog_annoations_go <- str_split(egg[eggnog_lines_with_go,]$GOs, ",")
+	gene_to_go <- data.frame(gene = rep(gene_ids[eggnog_lines_with_go], times = sapply(eggnog_annoations_go, length)), term = unlist(eggnog_annoations_go))
+	term2gene1 <- gene_to_go[, c(2, 1)]
+	term2gene <- buildGOmap(term2gene1)
+	go2ont <- go2ont(term2gene$GO)
+	go2term <- go2term(term2gene$GO)
+
+	# KEGG construct
+	gene2ko <- egg %>%
+                dplyr::select(GID = query, KO = KEGG_ko) %>%
+                na.omit()
+ 
+	if(!file.exists('kegg_info.RData')){
+	   library(jsonlite)
+	   library(purrr)
+	   library(RCurl)
+	   
+	   update_kegg <- function(json = "ko00001.json",file=NULL) {
+	     pathway2name <- tibble(Pathway = character(), Name = character())
+	     ko2pathway <- tibble(Ko = character(), Pathway = character())
+	     
+	     kegg <- fromJSON(json)
+	     
+	     for (a in seq_along(kegg[["children"]][["children"]])) {
+	              A <- kegg[["children"]][["name"]][[a]]
+	       
+	       for (b in seq_along(kegg[["children"]][["children"]][[a]][["children"]])) {
+	         B <- kegg[["children"]][["children"]][[a]][["name"]][[b]] 
+	         
+	         for (c in seq_along(kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]])) {
+	           pathway_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["name"]][[c]]
+	           
+	           pathway_id <- str_match(pathway_info, "ko[0-9]{5}")[1]
+	           pathway_name <- str_replace(pathway_info, " \\[PATH:ko[0-9]{5}\\]", "") %>% str_replace("[0-9]{5} ", "")
+	           pathway2name <- rbind(pathway2name, tibble(Pathway = pathway_id, Name = pathway_name))
+	           
+	           kos_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]][[c]][["name"]]
+	           
+	           kos <- str_match(kos_info, "K[0-9]*")[,1]
+	           
+	           ko2pathway <- rbind(ko2pathway, tibble(Ko = kos, Pathway = rep(pathway_id, length(kos))))
+	         }
+	       }
+	     }
+	     
+	     save(pathway2name, ko2pathway, file = file)
+	   }
+	   
+	   update_kegg(json = "ko00001.json",file="kegg_info.RData")
+	   
+	}
+
+ 	load('./kegg_info.RData')                                     
+	colnames(ko2pathway)=c("KO",'Pathway')
+	library(stringr)
+	gene2ko$KO=str_replace(gene2ko$KO,"ko:","")
+ 
+	# enrich GO
+	gene1_go_enrich<-enricher(gene1, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	gene2_go_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	write.table(gene1_go_enrich, file = "GO_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(gene2_go_enrich, file = "GO_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	
+	# comparecluster GO
+ 	gene_cluster = list(cluster1 = gene1, cluster2 = gene2, all=c(gene1,gene2))
+	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
+ 	df2_go_all <- compareCluster(gene_cluster, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
+	df2_go_all_pair <- pairwise_termsim(df2_go_all, method="Wang", semData = go_all)
+	
+	gene_cluster1 = list(cluster1 = gene1, cluster2 = gene2)
+	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
+ 	df1_go_all <- compareCluster(gene_cluster1, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
+	df1_go_all_pair <- pairwise_termsim(df1_go_all, method="Wang", semData = go_all)
+	
+	pdf("GO_enrichment_compare_cluster.pdf",height=40,width=40)
+	emapplot(df1_go_all_pair,cex_label_category=4)
+	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/1c260854-a783-4320-9555-6a8c143f067e)
+
+	pdf("GO_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
+	dotplot(gene1_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
+	dotplot(gene2_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
+ 	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/76354ea8-fbff-40cc-89d6-7ce1757097b7)
+
+	dotplot(gene_all_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster_ALL")
+	dotplot(df1_go_all,  showCategory = 20) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
+	"green")
+	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/3a736d32-d6f9-4759-9962-c92aa41dd9a4)
+ 
+	pdf("GO_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
+	emapplot_cluster(df1_go_all_pair,cex_label_group=2)
+	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/a9423074-4727-4a57-a7c5-d20cfa8c5750)
+
+ 	# simplify GO
+  	egg<-read.delim("GO_enrichment_cluster1.txt")
+	cluster1_GO <- as.matrix(egg$ID)
+	cluster1_GO_mat = GO_similarity(cluster1_GO,ont=c("BP","CC","MF"))
+
+ 	cluster2_GO <- as.matrix(gene2_go_enrich$ID)
+  	cluster2_GO_mat = GO_similarity(cluster2_GO,ont=c("BP","CC","MF"))	
+   
+	pdf("GO_simplify_cluster.pdf")
+	df_cluster1<- simplifyGO(cluster1_GO_mat, word_cloud_grob_param = list(max_width = 80))
+ 	df_cluster2<- simplifyGO(cluster2_GO_mat, word_cloud_grob_param = list(max_width = 80))
+  	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/22c5afa1-4d0e-4abe-aaed-de5c72c9b423)
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/93121085-dc8b-4b91-86b8-fd5efa5c7205)
+
+ 	# enrich KEGG
+	gene1_kegg_enrich<-enricher(gene1, TERM2GENE = gene2pathway, TERM2NAME = pathway2name, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	gene2_kegg_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	write.table(gene1_kegg_enrich, file = "KEGG_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(gene2_kegg_enrich, file = "KEGG_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	
+ 	pdf("KEGG_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
+ 	dotplot(gene1_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
+	dotplot(gene2_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
+	dotplot(gene_kegg_enrich_compare,  showCategory = 30) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
+        "green")
+	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/4a196213-7b76-49f0-ae7a-814c92c78fe6)
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/621a00ac-8bc5-4a94-8750-6d7be4ddf628)
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/e1ca02e6-b599-4e48-9aa6-f63984d7a4e1)
+
+	gene_kegg_enrich_compare <- compareCluster(gene_cluster1, fun = 'enricher',TERM2GENE = gene2pathway, TERM2NAME = pathway2name,pvalueCutoff = 1, qvalueCutoff = 1)
+	df2_kegg_all_pair <- pairwise_termsim(gene_kegg_enrich_compare, method="JC", semData =NULL)
+	pdf("KEGG_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
+	emapplot_cluster(df2_kegg_all_pair,cex_label_group=2)
+ 	dev.off()
+	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/cb75d0fc-d58f-4496-8147-61a50001eec2)
+
+
+
+
+
+
+
+
+
+
+
+ 
