@@ -721,23 +721,23 @@ supplementary add figures in pdf files
 	pdf("GO_enrichment_compare_cluster.pdf",height=40,width=40)
 	emapplot(df1_go_all_pair,cex_label_category=4)
 	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/1c260854-a783-4320-9555-6a8c143f067e)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/1c260854-a783-4320-9555-6a8c143f067e)
 
 	pdf("GO_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
 	dotplot(gene1_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
 	dotplot(gene2_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
- 	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/76354ea8-fbff-40cc-89d6-7ce1757097b7)
+ ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/76354ea8-fbff-40cc-89d6-7ce1757097b7)
 
 	dotplot(gene_all_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster_ALL")
 	dotplot(df1_go_all,  showCategory = 20) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
 	"green")
 	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/3a736d32-d6f9-4759-9962-c92aa41dd9a4)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/3a736d32-d6f9-4759-9962-c92aa41dd9a4)
  
 	pdf("GO_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
 	emapplot_cluster(df1_go_all_pair,cex_label_group=2)
 	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/a9423074-4727-4a57-a7c5-d20cfa8c5750)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/a9423074-4727-4a57-a7c5-d20cfa8c5750)
 
  	# simplify GO
   	egg<-read.delim("GO_enrichment_cluster1.txt")
@@ -751,8 +751,8 @@ supplementary add figures in pdf files
 	df_cluster1<- simplifyGO(cluster1_GO_mat, word_cloud_grob_param = list(max_width = 80))
  	df_cluster2<- simplifyGO(cluster2_GO_mat, word_cloud_grob_param = list(max_width = 80))
   	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/22c5afa1-4d0e-4abe-aaed-de5c72c9b423)
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/93121085-dc8b-4b91-86b8-fd5efa5c7205)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/22c5afa1-4d0e-4abe-aaed-de5c72c9b423)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/93121085-dc8b-4b91-86b8-fd5efa5c7205)
 
  	# enrich KEGG
 	gene1_kegg_enrich<-enricher(gene1, TERM2GENE = gene2pathway, TERM2NAME = pathway2name, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
@@ -766,16 +766,18 @@ supplementary add figures in pdf files
 	dotplot(gene_kegg_enrich_compare,  showCategory = 30) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
         "green")
 	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/4a196213-7b76-49f0-ae7a-814c92c78fe6)
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/621a00ac-8bc5-4a94-8750-6d7be4ddf628)
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/e1ca02e6-b599-4e48-9aa6-f63984d7a4e1)
+	
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/4a196213-7b76-49f0-ae7a-814c92c78fe6)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/621a00ac-8bc5-4a94-8750-6d7be4ddf628)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/e1ca02e6-b599-4e48-9aa6-f63984d7a4e1)
 
 	gene_kegg_enrich_compare <- compareCluster(gene_cluster1, fun = 'enricher',TERM2GENE = gene2pathway, TERM2NAME = pathway2name,pvalueCutoff = 1, qvalueCutoff = 1)
 	df2_kegg_all_pair <- pairwise_termsim(gene_kegg_enrich_compare, method="JC", semData =NULL)
 	pdf("KEGG_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
 	emapplot_cluster(df2_kegg_all_pair,cex_label_group=2)
  	dev.off()
-	![image](https://github.com/LittleFrogHill/Protist/assets/34407101/cb75d0fc-d58f-4496-8147-61a50001eec2)
+	
+ ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/cb75d0fc-d58f-4496-8147-61a50001eec2)
 
 
 
