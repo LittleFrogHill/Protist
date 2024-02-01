@@ -416,7 +416,8 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	blastp -db /home/shangao/Data/clean_data_protsist/trinity/longest_transcription/trandecoder/unigene.cdhit0.9.fasta.transdecoder.pep.cdhit -query $i.fasta -max_target_seqs 1 -outfmt 6 -evalue 1e-4 -num_threads 10 > ../$i.2pro.blastn.out
 	cd ..
 	done
-![image](https://user-images.githubusercontent.com/34407101/172344425-d04b5658-1eda-4788-8243-cb331d41aa32.png)
+![meiosis_heatmap_aichanged-01-01](https://github.com/LittleFrogHill/Protist/assets/34407101/bcc6bcbd-20f4-4b7b-98c1-10c4ebbe7ab2)
+
 
 ## 11.	Phylogenetic
 ### blast and prepare seqs from different species
