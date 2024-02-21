@@ -416,7 +416,17 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	blastp -db /home/shangao/Data/clean_data_protsist/trinity/longest_transcription/trandecoder/unigene.cdhit0.9.fasta.transdecoder.pep.cdhit -query $i.fasta -max_target_seqs 1 -outfmt 6 -evalue 1e-4 -num_threads 10 > ../$i.2pro.blastn.out
 	cd ..
 	done
-![meiosis_heatmap_aichanged-01-01](https://github.com/LittleFrogHill/Protist/assets/34407101/bcc6bcbd-20f4-4b7b-98c1-10c4ebbe7ab2)
+
+	library(pheatmap)
+ 	heat1 <- read.table('meiosis.genelist.uniq.pep.with8more_genename',,sep='\t',header=T)
+  	exp<-heat1[4:13]
+   	row.names(exp)<-heat1[,1]
+ 	group_fun<-data.frame(heat1[,2:3])
+  	row.names(group_fun)<-heat1[,1]
+	pdf("meiosis_heatmap_update.pdf",width=20)
+	pheatmap(exp,annotation_row=group_fun,scale="row", cluster_cols = F,  cluster_rows = T,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,fontsize_row=5,annotation_colors=list(group=c('1'='#5e60ce','2'='#f8ad9d')))
+	dev.off()
+ ![meiosis_heatmap_update-01](https://github.com/LittleFrogHill/Protist/assets/34407101/4c764d9d-20b0-46f2-ad9a-921e60d9d131)
 
 
 ## 11.	Phylogenetic
