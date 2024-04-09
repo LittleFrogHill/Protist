@@ -281,7 +281,9 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	gseaplot2(kk2, geneSetID = c(4,19,8), pvalue_table = TRUE,color = c("#E495A5", "#86B875", "#7DB0DD"), ES_geom = "dot")
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171684961-66c7ad25-8159-41c9-9bb4-001827d90828.png)
-	https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideTEXT.htm#_Enrichment_Score_(ES)
+	
+ 	https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideTEXT.htm#_Enrichment_Score_(ES)
+  	https://www.pathwaycommons.org/guide/primers/data_analysis/gsea/
 
 #### KEGG module over-representation analysis
 	mkk <- enrichMKEGG(gene = gene,organism = 'hsa',pvalueCutoff = 1,qvalueCutoff = 1,keyType= "kegg")
