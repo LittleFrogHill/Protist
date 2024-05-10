@@ -378,9 +378,7 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	pdf("meiosis_heatmap_update.pdf",width=20)
 	pheatmap(exp,annotation_row=group_fun,scale="row", cluster_cols = F,  cluster_rows = T,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,fontsize_row=5,annotation_colors=list(group=c('1'='#5e60ce','2'='#f8ad9d')))
 	dev.off()
- ![meiosis_heatmap_update-01](https://github.com/LittleFrogHill/Protist/assets/34407101/4c764d9d-20b0-46f2-ad9a-921e60d9d131)
-
-
+![fig3-01-01](https://github.com/LittleFrogHill/Protist/assets/34407101/fcccfdf5-3973-4f4e-bb72-b05005a2cccd)
 
 
 ## 12.	clustertree
