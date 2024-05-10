@@ -339,56 +339,6 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	dev.off()
 ![image](https://user-images.githubusercontent.com/34407101/171684448-b3bc8cc6-0222-4d05-9d2f-efc386baf1d2.png)
 
-### Ptm_database
-
-	d <- read.table('ptm.annoDEGs.out')
-	geneList <- d[,2]
-	names(geneList) <- as.character(d[,1])
-	geneList <- sort(geneList, decreasing = TRUE)
-	gene <- names(geneList)[abs(geneList) > 0.5]
-	library(clusterProfiler)
-	
-	pdf('bar1.pdf')
-	barplot(kk1, showCategory=20)
-	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/123746304-bf95ab00-d8b1-11eb-97d8-0d40c73ab091.png)
-	
-	pdf('dot.pdf')
-	dotplot(kk, showCategory=30) + ggtitle("dotplot for ptm_database")
-	dev.off()
-![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
-
-### Network
-	> pdf('Network1.pdf',pointsize=2,width=100,height=100)
-	> cnetplot(edox, foldChange=geneList,showCategory=20)
-	> dev.off()
-	
-	> pdf('Network2.pdf',pointsize=2,width=100,height=100)
-	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,)
-	x=             showCategory=  foldChange=    layout=        ...=           
-	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,showCategory=20)
-	> dev.off()
-	
-	> pdf('Network3.pdf',pointsize=2,width=100,height=100)
-	> cnetplot(kk, foldChange=geneList, circular = TRUE, colorEdge = TRUE,showCategory=20)
-	Warning message:
-	ggrepel: 1 unlabeled data points (too many overlaps). Consider increasing max.overlaps 
-	> dev.off()
-	
-	> pdf('Network_Enriched1.pdf',pointsize=1,width=50,height=50)
-	> cnetplot(edox, node_label="all",showCategory=20)
-	> dev.off()
-
-### Heatmap
-	> pdf('Heatmap.pdf',pointsize=1,width=80,height=10)
-	> heatplot(edox, foldChange=geneList)
-	> dev.off()
-	
-### Enrich
-	> pdf('Enrich.pdf',pointsize=5,width=50,height=50)
-	> emapplot(kk, pie_scale=1.5,layout="kk")
-	> dev.off()
-
 ## 10. Meiosis-related genes Blast
 ### download the Meiosis-related genes and blastp to our database
 	cat blastp2pro.sh
@@ -431,19 +381,10 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
  ![meiosis_heatmap_update-01](https://github.com/LittleFrogHill/Protist/assets/34407101/4c764d9d-20b0-46f2-ad9a-921e60d9d131)
 
 
-## 11.	Phylogenetic
-### blast and prepare seqs from different species
 
-### aln
-	mafft rad50.fa > rad50.aln
-### IQ-tree
-	iqtree-omp -s rad50.aln -st AA -nt 16 -quiet -bb 1000 -m TESTNEW -msub nuclear
 
-[results.pdf](https://github.com/LittleFrogHill/Protist/files/7640959/results.pdf)
-![image](https://user-images.githubusercontent.com/34407101/144400820-cf8f612e-c734-43e1-a975-c534ccfa1ba6.png)
-![image](https://user-images.githubusercontent.com/34407101/144400849-d8594782-cc34-43cf-afe5-c979d7417e13.png)
-
-## 12.	clustertree(https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect)
+## 12.	clustertree
+	(https://mp.weixin.qq.com/s?__biz=MzI5NjUyNzkxMg==&mid=2247485611&idx=1&sn=69990a569c623730583b56e54d55b58b&scene=21#wechat_redirect)
 
 	conda activate BRAKER
 	R
@@ -472,7 +413,7 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	library(seqinr)
 	library(UpSetR)
 	library(purrr)
-	# Calculate DEGs
+### Calculate DEGs
 	colData <- read.table('../../../sample.list', header=T,row.names=1)
 	countData <-read.table('../../../merged.genes.result.file', row.names='id',header=T)
 	dds <- DESeqDataSetFromMatrix(countData = round(countData),colData = colData, design = ~ group)
@@ -482,12 +423,11 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	resdata <- merge(as.data.frame(res), as.data.frame(counts(dds2, normalized=TRUE)),by='row.names',sort=FALSE)
 	rld <- rlog(dds, blind=FALSE)
 	
-	# Extracting transformed count values
+### Extracting transformed count values
 	vsd <- vst(dds, blind=FALSE)
 	vsd_matrix <- assay(vsd)
 	
-	# Cluster
-	# Cutoff readcount>50, padj 0.05
+### Cluster (Cutoff readcount>50, padj 0.05)
 	as.data.frame(res) %>%
 	filter(padj < 0.05) -> res_diff
 	as.data.frame(res) %>% filter(padj < 0.05) -> res_diff
@@ -496,16 +436,16 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	dge_set <- c(rownames(res_diff))
 	dge_set <- unique(dge_set)
 	
-	# Generate z-score matrix for heatmaps
+### Generate z-score matrix for heatmaps
 	vsd_matrix_dge <- vsd_matrix[dge_set,]
 	heat <- t(scale(t(vsd_matrix)))
 	heat <- heat[dge_set,]
 	
-	# Clusters rows by Pearson correlation as distance method
+### Clusters rows by Pearson correlation as distance method
 	hc <- hclust(as.dist(1 - cor(t(as.matrix(vsd_matrix_dge)))))
 	my_transcript_partition_assignments <- cutree(hc, h = 80/100*max(hc$height))
 	
-	# Visualise dendrogram with clusters
+### Visualise dendrogram with clusters
 	clust.cutree <- dendextend:::cutree(as.dendrogram(hc), h = 80/100*max(hc$height), order_clusters_as_data = FALSE)
 	idx <- order(names(clust.cutree))
 	clust.cutree <- clust.cutree[idx]
@@ -522,25 +462,25 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	
 ![image](https://user-images.githubusercontent.com/34407101/216330344-aa3f8ee0-5775-4f98-8b05-321ebbfdf2c5.png)
 
-	# Make factor_labeling.txt for goseq
+### Make factor_labeling.txt for goseq
 	data.frame(my_transcript_partition_assignments) %>%
 	rownames_to_column(var = "transcripts") -> factor_labeling
 	colnames(factor_labeling) <- c("transcript", "cluster")
-	#write.table(factor_labeling, 
-	#            file = paste0(mydir, "/Module_5/GO_analysis/factor_labeling.txt"),
-	#            row.names = FALSE,
-	#            col.names = FALSE,
-	#            quote = FALSE,
-	#            sep = "\t")
+	write.table(factor_labeling, 
+	            file = paste0(mydir, "/Module_5/GO_analysis/factor_labeling.txt"),
+	            row.names = FALSE,
+	            col.names = FALSE,
+	            quote = FALSE,
+	            sep = "\t")
 	
-	# Make list of clusters
+### Make list of clusters
 	clusterlist <- list()
 	for (i in c(1:max(my_transcript_partition_assignments))) {
 	  cluster <- heat[(my_transcript_partition_assignments == i),]
 	  clusterlist[[i]] <- cluster
 	}
 
-	# Plot clusters as boxplots
+### Plot clusters as boxplots
 	p <- list()
 	splan <- 3 - 1L
 	for (i in 1:max(my_transcript_partition_assignments)) {
@@ -564,7 +504,222 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	
 ![image](https://user-images.githubusercontent.com/34407101/216330407-570da456-1aa5-4f48-889f-6ef852eb2e9d.png)
 
-	# GO import and heatmap
+### Other figures in pdf files
+	GO_enrichment_cluster1.pdf
+	GO_enrichment_cluster2.pdf
+	KEGG_enrichment_cluster1.pdf
+	KEGG_enrichment_cluster2.pdf
+
+## 13. Annotated by eggnog-mapper
+	library(stringr)
+	require(DOSE)
+	require(clusterProfiler)
+	library(enrichplot)
+	library(ggplot2)
+	library(tibble)
+	library(org.Fterrestris.eg.db)
+	library(GOSemSim)
+	library(simplifyEnrichment)
+
+ 
+### data read
+ 	egg<-read.delim("pro.emapper.annotations")
+	d1 <- read.table('cluster1')
+	d2 <- read.table('cluster2')
+	gene1<-as.matrix(d1)
+	gene2<-as.matrix(d2)
+
+### GO construct
+	gene_ids <- egg$query
+	eggnog_lines_with_go <- egg$GOs!='-'
+	eggnog_annoations_go <- str_split(egg[eggnog_lines_with_go,]$GOs, ",")
+	gene_to_go <- data.frame(gene = rep(gene_ids[eggnog_lines_with_go], times = sapply(eggnog_annoations_go, length)), term = unlist(eggnog_annoations_go))
+	term2gene1 <- gene_to_go[, c(2, 1)]
+	term2gene <- buildGOmap(term2gene1)
+	go2ont <- go2ont(term2gene$GO)
+	go2term <- go2term(term2gene$GO)
+
+### KEGG construct
+	gene2ko <- egg %>%
+                dplyr::select(GID = query, KO = KEGG_ko) %>%
+                na.omit()
+ 
+	if(!file.exists('kegg_info.RData')){
+	   library(jsonlite)
+	   library(purrr)
+	   library(RCurl)
+	   
+	   update_kegg <- function(json = "ko00001.json",file=NULL) {
+	     pathway2name <- tibble(Pathway = character(), Name = character())
+	     ko2pathway <- tibble(Ko = character(), Pathway = character())
+	     
+	     kegg <- fromJSON(json)
+	     
+	     for (a in seq_along(kegg[["children"]][["children"]])) {
+	              A <- kegg[["children"]][["name"]][[a]]
+	       
+	       for (b in seq_along(kegg[["children"]][["children"]][[a]][["children"]])) {
+	         B <- kegg[["children"]][["children"]][[a]][["name"]][[b]] 
+	         
+	         for (c in seq_along(kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]])) {
+	           pathway_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["name"]][[c]]
+	           
+	           pathway_id <- str_match(pathway_info, "ko[0-9]{5}")[1]
+	           pathway_name <- str_replace(pathway_info, " \\[PATH:ko[0-9]{5}\\]", "") %>% str_replace("[0-9]{5} ", "")
+	           pathway2name <- rbind(pathway2name, tibble(Pathway = pathway_id, Name = pathway_name))
+	           
+	           kos_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]][[c]][["name"]]
+	           
+	           kos <- str_match(kos_info, "K[0-9]*")[,1]
+	           
+	           ko2pathway <- rbind(ko2pathway, tibble(Ko = kos, Pathway = rep(pathway_id, length(kos))))
+	         }
+	       }
+	     }
+	     
+	     save(pathway2name, ko2pathway, file = file)
+	   }
+	   
+	   update_kegg(json = "ko00001.json",file="kegg_info.RData")
+	   
+	}
+
+ 	load('./kegg_info.RData')                                     
+	colnames(ko2pathway)=c("KO",'Pathway')
+	library(stringr)
+	gene2ko$KO=str_replace(gene2ko$KO,"ko:","")
+ 
+### enrich GO
+	gene1_go_enrich<-enricher(gene1, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	gene2_go_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	write.table(gene1_go_enrich, file = "GO_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(gene2_go_enrich, file = "GO_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	
+### comparecluster GO
+ 	gene_cluster = list(cluster1 = gene1, cluster2 = gene2, all=c(gene1,gene2))
+	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
+ 	df2_go_all <- compareCluster(gene_cluster, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
+	df2_go_all_pair <- pairwise_termsim(df2_go_all, method="Wang", semData = go_all)
+	
+	gene_cluster1 = list(cluster1 = gene1, cluster2 = gene2)
+	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
+ 	df1_go_all <- compareCluster(gene_cluster1, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
+	df1_go_all_pair <- pairwise_termsim(df1_go_all, method="Wang", semData = go_all)
+	
+	pdf("GO_enrichment_compare_cluster.pdf",height=40,width=40)
+	emapplot(df1_go_all_pair,cex_label_category=4)
+	dev.off()
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/1c260854-a783-4320-9555-6a8c143f067e)
+
+	pdf("GO_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
+	dotplot(gene1_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
+	dotplot(gene2_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
+ ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/76354ea8-fbff-40cc-89d6-7ce1757097b7)
+
+	dotplot(gene_all_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster_ALL")
+	dotplot(df1_go_all,  showCategory = 20) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
+	"green")
+	dev.off()
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/3a736d32-d6f9-4759-9962-c92aa41dd9a4)
+ 
+	pdf("GO_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
+	emapplot_cluster(df1_go_all_pair,cex_label_group=2)
+	dev.off()
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/a9423074-4727-4a57-a7c5-d20cfa8c5750)
+
+ ### simplify GO
+  	egg<-read.delim("GO_enrichment_cluster1.txt")
+	cluster1_GO <- as.matrix(egg$ID)
+	cluster1_GO_mat = GO_similarity(cluster1_GO,ont=c("BP","CC","MF"))
+
+ 	cluster2_GO <- as.matrix(gene2_go_enrich$ID)
+  	cluster2_GO_mat = GO_similarity(cluster2_GO,ont=c("BP","CC","MF"))	
+   
+	pdf("GO_simplify_cluster.pdf")
+	df_cluster1<- simplifyGO(cluster1_GO_mat, word_cloud_grob_param = list(max_width = 80))
+ 	df_cluster2<- simplifyGO(cluster2_GO_mat, word_cloud_grob_param = list(max_width = 80))
+  	dev.off()
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/22c5afa1-4d0e-4abe-aaed-de5c72c9b423)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/93121085-dc8b-4b91-86b8-fd5efa5c7205)
+
+ ### enrich KEGG
+	gene1_kegg_enrich<-enricher(gene1, TERM2GENE = gene2pathway, TERM2NAME = pathway2name, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	gene2_kegg_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
+	write.table(gene1_kegg_enrich, file = "KEGG_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
+	write.table(gene2_kegg_enrich, file = "KEGG_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
+	
+ 	pdf("KEGG_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
+ 	dotplot(gene1_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
+	dotplot(gene2_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
+	dotplot(gene_kegg_enrich_compare,  showCategory = 30) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
+        "green")
+	dev.off()
+	
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/4a196213-7b76-49f0-ae7a-814c92c78fe6)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/621a00ac-8bc5-4a94-8750-6d7be4ddf628)
+![image](https://github.com/LittleFrogHill/Protist/assets/34407101/e1ca02e6-b599-4e48-9aa6-f63984d7a4e1)
+
+	gene_kegg_enrich_compare <- compareCluster(gene_cluster1, fun = 'enricher',TERM2GENE = gene2pathway, TERM2NAME = pathway2name,pvalueCutoff = 1, qvalueCutoff = 1)
+	df2_kegg_all_pair <- pairwise_termsim(gene_kegg_enrich_compare, method="JC", semData =NULL)
+	pdf("KEGG_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
+	emapplot_cluster(df2_kegg_all_pair,cex_label_group=2)
+ 	dev.off()
+	
+ ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/cb75d0fc-d58f-4496-8147-61a50001eec2)
+
+## 14.The analysis absent in paper
+### 14.1 Annotated by close species
+#### Ptm_database
+
+	d <- read.table('ptm.annoDEGs.out')
+	geneList <- d[,2]
+	names(geneList) <- as.character(d[,1])
+	geneList <- sort(geneList, decreasing = TRUE)
+	gene <- names(geneList)[abs(geneList) > 0.5]
+	library(clusterProfiler)
+	
+	pdf('bar1.pdf')
+	barplot(kk1, showCategory=20)
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746304-bf95ab00-d8b1-11eb-97d8-0d40c73ab091.png)
+	
+	pdf('dot.pdf')
+	dotplot(kk, showCategory=30) + ggtitle("dotplot for ptm_database")
+	dev.off()
+![image](https://user-images.githubusercontent.com/34407101/123746738-582c2b00-d8b2-11eb-90ab-7df079da3067.png)
+
+#### Network
+	> pdf('Network1.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(edox, foldChange=geneList,showCategory=20)
+	> dev.off()
+	
+	> pdf('Network2.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,)
+	x=             showCategory=  foldChange=    layout=        ...=           
+	> cnetplot(kk, categorySize="pvalue", foldChange=geneList,showCategory=20)
+	> dev.off()
+	
+	> pdf('Network3.pdf',pointsize=2,width=100,height=100)
+	> cnetplot(kk, foldChange=geneList, circular = TRUE, colorEdge = TRUE,showCategory=20)
+	Warning message:
+	ggrepel: 1 unlabeled data points (too many overlaps). Consider increasing max.overlaps 
+	> dev.off()
+	
+	> pdf('Network_Enriched1.pdf',pointsize=1,width=50,height=50)
+	> cnetplot(edox, node_label="all",showCategory=20)
+	> dev.off()
+
+#### Heatmap
+	> pdf('Heatmap.pdf',pointsize=1,width=80,height=10)
+	> heatplot(edox, foldChange=geneList)
+	> dev.off()
+	
+#### Enrich
+	> pdf('Enrich.pdf',pointsize=5,width=50,height=50)
+	> emapplot(kk, pie_scale=1.5,layout="kk")
+	> dev.off()
+### 14.2 Cluster annotated
+#### GO import and heatmap
 	library(clusterProfiler)
 	library(org.Hs.eg.db)
 	d1 <- read.table('cluster1.out')
@@ -621,181 +776,29 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	pheatmap(heat2_exp, scale="row", cluster_cols = F,  cluster_rows = F,  show_colnames = F, gaps_col = c(5),cellwidth = 10, cellheight = 10,main="sexual reproduction",fontsize_row=5)
 	dev.off()
 cluster1
-
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/fefdd789-9689-42aa-b4b3-a4a61afd3cbf)
-
 cluster2
-
 ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/f73e1626-5e60-42c8-af1e-1085baeb4ee6)
 
-supplementary add figures in pdf files
+### 14.3 WGCNA
+	Followed by the pipeline (https://alexslemonade.github.io/refinebio-examples/04-advanced-topics/network-analysis_rnaseq_01_wgcna.html#42_Import_and_set_up_data)
+	
+ 	conda activate r_env
 
-	GO_enrichment_cluster1.pdf
-	GO_enrichment_cluster2.pdf
-	KEGG_enrichment_cluster1.pdf
-	KEGG_enrichment_cluster2.pdf
+ 	# Attach the DESeq2 library
+	library(DESeq2)
 
-## 13. Annotated by eggnog-mapper
-	library(stringr)
-	require(DOSE)
-	require(clusterProfiler)
-	library(enrichplot)
+	# We will need this so we can use the pipe: %>%
+	library(magrittr)
+
+	# We'll need this for finding gene modules
+	library(WGCNA)
+
+	# We'll be making some plots
 	library(ggplot2)
-	library(tibble)
-	library(org.Fterrestris.eg.db)
-	library(GOSemSim)
-	library(simplifyEnrichment)
 
- 
-	# data read
- 	egg<-read.delim("pro.emapper.annotations")
-	d1 <- read.table('cluster1')
-	d2 <- read.table('cluster2')
-	gene1<-as.matrix(d1)
-	gene2<-as.matrix(d2)
-
-  	# GO construct
-	gene_ids <- egg$query
-	eggnog_lines_with_go <- egg$GOs!='-'
-	eggnog_annoations_go <- str_split(egg[eggnog_lines_with_go,]$GOs, ",")
-	gene_to_go <- data.frame(gene = rep(gene_ids[eggnog_lines_with_go], times = sapply(eggnog_annoations_go, length)), term = unlist(eggnog_annoations_go))
-	term2gene1 <- gene_to_go[, c(2, 1)]
-	term2gene <- buildGOmap(term2gene1)
-	go2ont <- go2ont(term2gene$GO)
-	go2term <- go2term(term2gene$GO)
-
-	# KEGG construct
-	gene2ko <- egg %>%
-                dplyr::select(GID = query, KO = KEGG_ko) %>%
-                na.omit()
- 
-	if(!file.exists('kegg_info.RData')){
-	   library(jsonlite)
-	   library(purrr)
-	   library(RCurl)
-	   
-	   update_kegg <- function(json = "ko00001.json",file=NULL) {
-	     pathway2name <- tibble(Pathway = character(), Name = character())
-	     ko2pathway <- tibble(Ko = character(), Pathway = character())
-	     
-	     kegg <- fromJSON(json)
-	     
-	     for (a in seq_along(kegg[["children"]][["children"]])) {
-	              A <- kegg[["children"]][["name"]][[a]]
-	       
-	       for (b in seq_along(kegg[["children"]][["children"]][[a]][["children"]])) {
-	         B <- kegg[["children"]][["children"]][[a]][["name"]][[b]] 
-	         
-	         for (c in seq_along(kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]])) {
-	           pathway_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["name"]][[c]]
-	           
-	           pathway_id <- str_match(pathway_info, "ko[0-9]{5}")[1]
-	           pathway_name <- str_replace(pathway_info, " \\[PATH:ko[0-9]{5}\\]", "") %>% str_replace("[0-9]{5} ", "")
-	           pathway2name <- rbind(pathway2name, tibble(Pathway = pathway_id, Name = pathway_name))
-	           
-	           kos_info <- kegg[["children"]][["children"]][[a]][["children"]][[b]][["children"]][[c]][["name"]]
-	           
-	           kos <- str_match(kos_info, "K[0-9]*")[,1]
-	           
-	           ko2pathway <- rbind(ko2pathway, tibble(Ko = kos, Pathway = rep(pathway_id, length(kos))))
-	         }
-	       }
-	     }
-	     
-	     save(pathway2name, ko2pathway, file = file)
-	   }
-	   
-	   update_kegg(json = "ko00001.json",file="kegg_info.RData")
-	   
-	}
-
- 	load('./kegg_info.RData')                                     
-	colnames(ko2pathway)=c("KO",'Pathway')
-	library(stringr)
-	gene2ko$KO=str_replace(gene2ko$KO,"ko:","")
- 
-	# enrich GO
-	gene1_go_enrich<-enricher(gene1, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
-	gene2_go_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
-	write.table(gene1_go_enrich, file = "GO_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
-	write.table(gene2_go_enrich, file = "GO_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
-	
-	# comparecluster GO
- 	gene_cluster = list(cluster1 = gene1, cluster2 = gene2, all=c(gene1,gene2))
-	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
- 	df2_go_all <- compareCluster(gene_cluster, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
-	df2_go_all_pair <- pairwise_termsim(df2_go_all, method="Wang", semData = go_all)
-	
-	gene_cluster1 = list(cluster1 = gene1, cluster2 = gene2)
-	go_all <- godata('org.Fterrestris.eg.db', ont=c("BP", "CC", "MF"),keytype = "GID")
- 	df1_go_all <- compareCluster(gene_cluster1, fun = 'enrichGO' ,OrgDb=org.Fterrestris.eg.db ,ont = "ALL", keyType="GID",pvalueCutoff = 1, qvalueCutoff = 1)
-	df1_go_all_pair <- pairwise_termsim(df1_go_all, method="Wang", semData = go_all)
-	
-	pdf("GO_enrichment_compare_cluster.pdf",height=40,width=40)
-	emapplot(df1_go_all_pair,cex_label_category=4)
-	dev.off()
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/1c260854-a783-4320-9555-6a8c143f067e)
-
-	pdf("GO_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
-	dotplot(gene1_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
-	dotplot(gene2_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
- ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/76354ea8-fbff-40cc-89d6-7ce1757097b7)
-
-	dotplot(gene_all_go_enrich, showCategory=30) + ggtitle("dotplot for Cluster_ALL")
-	dotplot(df1_go_all,  showCategory = 20) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
-	"green")
-	dev.off()
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/3a736d32-d6f9-4759-9962-c92aa41dd9a4)
- 
-	pdf("GO_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
-	emapplot_cluster(df1_go_all_pair,cex_label_group=2)
-	dev.off()
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/a9423074-4727-4a57-a7c5-d20cfa8c5750)
-
- 	# simplify GO
-  	egg<-read.delim("GO_enrichment_cluster1.txt")
-	cluster1_GO <- as.matrix(egg$ID)
-	cluster1_GO_mat = GO_similarity(cluster1_GO,ont=c("BP","CC","MF"))
-
- 	cluster2_GO <- as.matrix(gene2_go_enrich$ID)
-  	cluster2_GO_mat = GO_similarity(cluster2_GO,ont=c("BP","CC","MF"))	
-   
-	pdf("GO_simplify_cluster.pdf")
-	df_cluster1<- simplifyGO(cluster1_GO_mat, word_cloud_grob_param = list(max_width = 80))
- 	df_cluster2<- simplifyGO(cluster2_GO_mat, word_cloud_grob_param = list(max_width = 80))
-  	dev.off()
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/22c5afa1-4d0e-4abe-aaed-de5c72c9b423)
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/93121085-dc8b-4b91-86b8-fd5efa5c7205)
-
- 	# enrich KEGG
-	gene1_kegg_enrich<-enricher(gene1, TERM2GENE = gene2pathway, TERM2NAME = pathway2name, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
-	gene2_kegg_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
-	write.table(gene1_kegg_enrich, file = "KEGG_enrichment_cluster1.txt",sep = "\t", row.names = F,col.names = T)
-	write.table(gene2_kegg_enrich, file = "KEGG_enrichment_cluster2.txt",sep = "\t", row.names = F,col.names = T)
-	
- 	pdf("KEGG_enrichment_compare_cluster_dotplot.pdf",height=20,width=10)
- 	dotplot(gene1_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster1")
-	dotplot(gene2_kegg_enrich, showCategory=30) + ggtitle("dotplot for Cluster2")
-	dotplot(gene_kegg_enrich_compare,  showCategory = 30) + scale_y_discrete(labels = function(y) str_wrap(y, width = 50)) +  scale_size(range = c(3, 10)) + scale_color_continuous(low = "purple", high = 
-        "green")
-	dev.off()
-	
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/4a196213-7b76-49f0-ae7a-814c92c78fe6)
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/621a00ac-8bc5-4a94-8750-6d7be4ddf628)
-![image](https://github.com/LittleFrogHill/Protist/assets/34407101/e1ca02e6-b599-4e48-9aa6-f63984d7a4e1)
-
-	gene_kegg_enrich_compare <- compareCluster(gene_cluster1, fun = 'enricher',TERM2GENE = gene2pathway, TERM2NAME = pathway2name,pvalueCutoff = 1, qvalueCutoff = 1)
-	df2_kegg_all_pair <- pairwise_termsim(gene_kegg_enrich_compare, method="JC", semData =NULL)
-	pdf("KEGG_enrichment_compare_cluster_emapplot.pdf",height=25,width=20)
-	emapplot_cluster(df2_kegg_all_pair,cex_label_group=2)
- 	dev.off()
-	
- ![image](https://github.com/LittleFrogHill/Protist/assets/34407101/cb75d0fc-d58f-4496-8147-61a50001eec2)
-
-
-
-
-
+	countData <-read.table('./merged.genes.result.file', row.names='gene_id')
+ 	countData <- as.matrix(countData)
 
 
 
