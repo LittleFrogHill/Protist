@@ -537,11 +537,11 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	go2ont <- go2ont(term2gene$GO)
 	go2term <- go2term(term2gene$GO)
 
-### KEGG construct
 	gene2ko <- egg %>%
                 dplyr::select(GID = query, KO = KEGG_ko) %>%
                 na.omit()
  
+### KEGG construct
 	if(!file.exists('kegg_info.RData')){
 	   library(jsonlite)
 	   library(purrr)
@@ -586,7 +586,32 @@ https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html
 	colnames(ko2pathway)=c("KO",'Pathway')
 	library(stringr)
 	gene2ko$KO=str_replace(gene2ko$KO,"ko:","")
- 
+### constrct org.Fterrestris.eg.db
+	library(AnnotationForge)
+	goData = gene2go
+	any(!grepl("^GO:", as.character(goData$GO)))
+	head(gene_info)
+	head(gene2go)
+	summary(gene2go)
+	gene2go[grepl("^GO:", as.character(gene2go$GO)),]
+	d<-gene2go[grepl("^GO:", as.character(gene2go$GO)),]
+	
+	makeOrgPackage(gene_info=gene_info,
+	               go=d,
+	               ko=gene2ko,
+	               maintainer='GaoShan <gaoshan30954@163.com>',
+	               author='GaoShan <gaoshan30954@163.com>',
+	               pathway=gene2pathway,
+	               version="0.0.1",
+	               outputDir = ".",
+	               tax_id="1756192",
+	               genus="Fisculla",
+	               species="terrestris",
+	               goTable="go")
+		
+	install.packages("./org.Fterrestris.eg.db",repos = NULL, type="source",unlink=TRUE)
+	library(org.Fterrestris.eg.db)
+
 ### enrich GO
 	gene1_go_enrich<-enricher(gene1, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
 	gene2_go_enrich<-enricher(gene2, TERM2GENE = term2gene, TERM2NAME = go2term, pvalueCutoff = 0.05, qvalueCutoff = 0.05)
