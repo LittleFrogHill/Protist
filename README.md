@@ -2,6 +2,12 @@
 ## *De novo Fisculla terrestris* Transcription Data Analysis Pipeline
 
 ## 1.Trinity assembly
+	#!/bin/bash
+	for i in $(cat sample_list_protsist)
+	do
+	~/Software/QC/TrimGalore-0.6.5/trim_galore --phred33 --stringency 3 --length 20 -e 0.1 -q 20 --gzip --fastqc --paired --output_dir clean_data_protsist /home/shangao/Data/gaoshan/protist/A006200108_${i}_L003_R1_001.fastq.gz /home/shangao/Data/gaoshan/protist/A006200108_${i}_L003_R2_001.fastq.gz
+	done
+
 	LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH
 	export LD_LIBRARY_PATH
 	Trinity --seqType fq --max_memory 60G --CPU 20  \
